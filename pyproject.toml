@@ -1,0 +1,15 @@
+[project]
+name = "iccps-tutorial"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "marimo>=0.23.4",
+    "numpy>=2.4.4",
+    "numba>=0.60.0",
+    "ns-gym",
+]
+
+[tool.uv.sources]
+ns-gym = { path = "../ns_gym" }

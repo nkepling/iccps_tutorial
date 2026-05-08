@@ -1,0 +1,12 @@
+services:
+  jupyter:
+    # Pull the prebuilt multi-arch image from GitHub Container Registry by default.
+    # `build: .` is kept so `docker compose build` still works for local iteration.
+    # Substitute <gh-user-or-org> with your GitHub username or org (e.g. scope-lab-vu).
+    image: ghcr.io/<gh-user-or-org>/ns-gym-tutorial:iccps2026
+    build: .
+    container_name: ns-gym-tutorial
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/workspace
