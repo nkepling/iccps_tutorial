@@ -84,6 +84,102 @@ def _(mo):
 
 @app.cell(hide_code=True)
 def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">NS-Gym at a glance</div></div>
+
+
+    A framework for modeling non-stationary Markov Decision Processes
+    and the key problem types a decision-making entity may encounter:
+
+    - **Design** non-stationary environments in a fully configurable way
+      across a suite of Gymnasium environments.
+    - **Emulate** the key problem types for decision making under
+      non-stationarity (notification level × parameter type ×
+      schedule).
+    - **Test and evaluate** decision-making algorithms using included
+      metrics, NS-Gym baseline implementations, or your own RL agents.
+
+    The collage below shows the breadth of supported envs — toy text
+    grids, classic control, and MuJoCo continuous control all live
+    behind the same wrapper API.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    def _tile(path, label):
+        return mo.vstack(
+            [mo.image(f"assets/{path}", width=180),
+             mo.md(f"<div style='text-align:center; font-size:0.85em; opacity:0.7;'>{label}</div>")],
+            align="center",
+        )
+
+    mo.vstack([
+        mo.md("<div style='text-align:center; font-size:0.9em; opacity:0.6; letter-spacing:0.15em; font-weight:600;'>SUPPORTED ENVIRONMENTS &mdash; TOY TEXT &middot; CLASSIC CONTROL &middot; MUJOCO</div>"),
+        mo.hstack([
+            _tile("frozen_lake_stationary.gif", "FrozenLake"),
+            _tile("cartpole_stationary.gif", "CartPole"),
+            _tile("mountain_car.gif", "MountainCar"),
+            _tile("pendulum.gif", "Pendulum"),
+        ], justify="center", gap=1),
+        mo.hstack([
+            _tile("ant_stationary.gif", "Ant"),
+            _tile("half_cheetah.gif", "HalfCheetah"),
+            _tile("hopper.gif", "Hopper"),
+            _tile("humanoid.gif", "Humanoid"),
+        ], justify="center", gap=1),
+        mo.hstack([
+            _tile("inverted_pendulum.gif", "InvertedPendulum"),
+            _tile("inverted_double_pendulum.gif", "Inv. Double Pend."),
+            _tile("reacher.gif", "Reacher"),
+            _tile("swimmer.gif", "Swimmer"),
+        ], justify="center", gap=1),
+    ], gap=1)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Installing the tutorial materials</div></div>
+
+
+    **Option 1 · Native install with [uv](https://docs.astral.sh/uv/)** *(recommended)*
+    ---
+
+    ```bash
+    git clone https://github.com/nkepling/iccps_tutorial.git
+    cd iccps_tutorial
+    uv run marimo run tutorial.py
+    ```
+    `uv` resolves the script header at the top of `tutorial.py` and
+    builds an isolated env on first run. No global installs.
+
+    **Option 2 · Docker Compose Up**
+    ---
+    ```bash
+    git clone https://github.com/scope-lab-vu/iccps_tutorial.git
+    cd iccps_tutorial
+    docker compose up
+    ```
+
+    **Option 3  ·  Pull Docker Image**
+    ---
+
+    **Just want NS-Gym in your own project?**
+    ```bash
+    pip install ns-gym                                    # latest release
+    pip install git+https://github.com/scope-lab-vu/ns_gym  # nightly
+    ```
+    Project home: <https://nsgym.io/>  ·
+    Source: <https://github.com/scope-lab-vu/ns_gym>
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
     mo.Html("""
     <div style="
         margin: 5em 0 1.5em 0;
@@ -129,10 +225,6 @@ def _(mo):
        on every step that the dynamics moved?)*
     4. Does the agent **know** the change?  *(does the notification
        carry the new parameter, or just a "something moved" flag?)*
-
-    Questions 3 and 4 are the **notification levels** — `none`,
-    `change_notification`, and `delta_change_notification` — that the
-    NS-Gym wrapper surfaces to the agent on every `step()`.
     """)
     return
 
@@ -228,7 +320,7 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">What does an "agent" need to operate in non-stationary environments?</div></div>
 
-    A reactive agent in an NS-MDP typically needs three sub-components:
+     What constitutes an agent in the literature has been in flux, so in NS-Gym we try to keep the abstraction as generall as possible. We argue that in a real decision making entity may or may not consist of the following elements:
 
     1. **Decision-making algorithm** — produces an action given the
        current observation and (a model of) the dynamics.
@@ -238,10 +330,7 @@ def _(mo):
     3. **Model updater** — answers *"what is the updated parameter?"*
        and refreshes the planning model the decision-maker queries.
 
-    Different algorithms compress these three pieces differently:
-    stale VI does (1) only; myopic-replan VI does (1) + (3); RATS and
-    PA-MCTS push the planner to be robust to a *family* of futures
-    rather than one snapshot.
+    NS-Gym can emulate both the runtime and model updater components with its "notifications" mechanism.
     """)
     return
 
@@ -302,86 +391,32 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">NS-Gym at a glance</div></div>
+    <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #5a3a8a; background: #f3eef7;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">A quick intro to the standard Gymnasium API and workflow</div></div>
 
-    A framework for modeling non-stationary Markov Decision Processes
-    and the key problem types a decision-making entity may encounter:
+    "Gymnasium" is on open source toolkit for developing decision making algorithms for Markov Decision Procsses
 
-    - **Design** non-stationary environments in a fully configurable way
-      across a suite of Gymnasium environments.
-    - **Emulate** the key problem types for decision making under
-      non-stationarity (notification level × parameter type ×
-      schedule).
-    - **Test and evaluate** decision-making algorithms using included
-      metrics, NS-Gym baseline implementations, or your own RL agents.
+    In Gymnasium, an environment represents a Markov Decision Process (MDP). It provides a framework where an agent interacts with an environment by taking actions, observing states, and receiving rewards. Here’s a breakdown of key components:
 
-    The collage below shows the breadth of supported envs — toy text
-    grids, classic control, and MuJoCo continuous control all live
-    behind the same wrapper API.
+    **Environment** Object: This represents the MDP. It includes a set of states, a set of possible actions, and defines the rules for state transitions and rewards based on the agent's actions.
+
+    **Observation**: Represents the information the agent receives about the current state. It may not always provide complete information about the true state, depending on the environment's design.
+
+    **Info**: This is an optional dictionary that provides extra diagnostic information helpful for debugging or understanding the environment's behavior. It's not used directly for learning but can provide insights.
     """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    def _tile(path, label):
-        return mo.vstack(
-            [mo.image(f"assets/{path}", width=180),
-             mo.md(f"<div style='text-align:center; font-size:0.85em; opacity:0.7;'>{label}</div>")],
-            align="center",
-        )
-
-    mo.vstack([
-        mo.md("<div style='text-align:center; font-size:0.9em; opacity:0.6; letter-spacing:0.15em; font-weight:600;'>SUPPORTED ENVIRONMENTS &mdash; TOY TEXT &middot; CLASSIC CONTROL &middot; MUJOCO</div>"),
-        mo.hstack([
-            _tile("frozen_lake_stationary.gif", "FrozenLake"),
-            _tile("cartpole_stationary.gif", "CartPole"),
-            _tile("mountain_car.gif", "MountainCar"),
-            _tile("pendulum.gif", "Pendulum"),
-        ], justify="center", gap=1),
-        mo.hstack([
-            _tile("ant_stationary.gif", "Ant"),
-            _tile("half_cheetah.gif", "HalfCheetah"),
-            _tile("hopper.gif", "Hopper"),
-            _tile("humanoid.gif", "Humanoid"),
-        ], justify="center", gap=1),
-        mo.hstack([
-            _tile("inverted_pendulum.gif", "InvertedPendulum"),
-            _tile("inverted_double_pendulum.gif", "Inv. Double Pend."),
-            _tile("reacher.gif", "Reacher"),
-            _tile("swimmer.gif", "Swimmer"),
-        ], justify="center", gap=1),
-    ], gap=1)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
     mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">The wrapper at a glance — one step of an NS-Gym episode</div></div>
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">How Does NS-Gym Augment Gymnasium? </div></div>
 
-    Every interaction follows the same nine-step protocol the wrapper
-    enforces:
+    # NS-Gym provides a Set of Gymanisium Envionment wrappers that:
+    ------
 
-    1. Agent calls `env.get_planning_env()` to ask for a *planning*
-       view of the env.
-    2. Wrapper checks the **notification level** (`none`,
-       `change_notification`, `delta_change_notification`).
-    3. Returns the planning env redacted to that level.
-    4. Agent picks an action and calls `env.step(action)`.
-    5. Wrapper forwards the action *and* the parameters to the
-       update-function.
-    6. The scheduler decides whether **this step** triggers an update.
-    7. If yes, the update-function mutates $\theta$ and computes the
-       Wasserstein-style magnitude of the change.
-    8. Wrapper returns the new parameters, a `change` boolean, and
-       `delta_change` magnitude back into the observation dict.
-    9. Wrapper returns `(obs, reward, done, truncated, info)` to the
-       agent.
+    ### 1) Defines a set of observable environment parameters, $\theta$ that in a completely configurable manner be altered to induced non-stationarity
 
-    This decoupling — base env, scheduler, update-function, wrapper —
-    is what lets us mix-and-match the four building blocks for the
-    rest of the tutorial.
+    ### 2) Controls the nature of agent-environment interaction in a non-starionary desicion emulating the runtime and model updater components -- therefore focusing development of the core decision making algorithms
     """)
     return
 
@@ -466,84 +501,6 @@ def _(mo):
     it'll plan on $\mathcal{M}_0$ and lose. Same algorithm, different
     notification level → different behavior.
     """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Installing the tutorial materials</div></div>
-
-    Pick whichever option works on your machine — all three end up at
-    the same notebook.
-
-    **Option 1 · Native install with [uv](https://docs.astral.sh/uv/)** *(recommended)*
-    ```bash
-    git clone https://github.com/scope-lab-vu/iccps_tutorial.git
-    cd iccps_tutorial
-    uv run marimo edit tutorial.py
-    ```
-    `uv` resolves the script header at the top of `tutorial.py` and
-    builds an isolated env on first run. No global installs.
-
-    **Option 2 · Docker**
-    ```bash
-    git clone https://github.com/scope-lab-vu/iccps_tutorial.git
-    cd iccps_tutorial
-    docker compose up
-    ```
-    Then open `http://localhost:2718` in your browser.
-
-    **Option 3 · Web (no install)**
-    Open the hosted notebook at **<https://nsgym.io/>** → *Tutorials*.
-
-    ---
-
-    **Just want NS-Gym in your own project?**
-    ```bash
-    pip install ns-gym                                    # latest release
-    pip install git+https://github.com/scope-lab-vu/ns_gym  # nightly
-    ```
-    Project home: <https://nsgym.io/>  ·
-    Source: <https://github.com/scope-lab-vu/ns_gym>
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">A 10-line NS-Gym taste-test</div></div>
-
-    Straight from the [NS-Gym quickstart](https://nsgym.io/quickstart_guide.html) —
-    a CartPole whose `masspole` drifts continuously and whose `gravity`
-    random-walks every 3 steps:
-
-    ```python
-    import gymnasium as gym
-    from ns_gym.wrappers import NSClassicControlWrapper
-    from ns_gym.schedulers import ContinuousScheduler, PeriodicScheduler
-    from ns_gym.update_functions import IncrementUpdate, RandomWalk
-
-    env = gym.make("CartPole-v1")
-    tunable_params = {
-        "masspole": IncrementUpdate(ContinuousScheduler(), k=0.1),
-        "gravity":  RandomWalk(PeriodicScheduler(period=3)),
-    }
-    ns_env = NSClassicControlWrapper(env, tunable_params,
-                                     change_notification=True)
-    obs, info = ns_env.reset()
-    ```
-
-    Module 1 unpacks every one of these moving pieces — schedulers,
-    update functions, wrappers, notifications — and turns them into
-    sliders so you can build your own.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _():
     return
 
 
@@ -709,7 +666,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    ## 1. Anatomy of an NS-MDP — FrozenLake
+    ## 1. Anatomy of an NS-MDP
 
     Every NS-MDP in `ns-gym` is built from four pieces:
 
@@ -743,6 +700,269 @@ def _(mo):
     Wrappers map onto environment families: `NSClassicControlWrapper`,
     `NSFrozenLakeWrapper`, `NSCliffWalkingWrapper`, `NSBridgeWrapper`,
     `MujocoWrapper`.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">A 10-line NS-Gym taste-test</div></div>
+
+    Straight from the [NS-Gym quickstart](https://nsgym.io/quickstart_guide.html) —
+    a CartPole whose `masspole` drifts continuously and whose `gravity`
+    random-walks every 3 steps:
+
+    The basic workflow of NS-Gym easy augments existing Gymnasium environments with non-starionary behavior.
+
+    In code the steps are as follows:
+
+    **Import Necesarry Modules**
+
+    ```python
+    import gymnasium as gym
+    from ns_gym.wrappers import NSClassicControlWrapper
+    from ns_gym.schedulers import ContinuousScheduler, PeriodicScheduler
+    from ns_gym.update_functions import IncrementUpdate, RandomWalk
+    ```
+
+    **1)** Make a Gymnasium environment
+
+    ```python
+    env = gym.make("CartPole-v1")
+    ```
+
+    **2)** Decide **what** about then environment changes
+
+    ```python
+    param_1 = "masspole" #mass of the pole
+    param_2 = "gravity" #gravity of the environment
+    ```
+    **3)** Decide **when** parameters change
+
+    ```python
+    scheduler_1 = ContinuousScheduler() #every time step
+    scheduler_2 = PeriodicScheduler(period=3) #every third time step
+    ```
+
+    **4)** Decide **how** parameters change
+
+    ```python
+    update_function_1 = IncrementUpdate(sheduler_1, k=0.1) # At scheduler_1 timesteps increment param_1 value by 0.1
+    update_function_2 = RandomWalk(scheduler_2) # At scheduler_2 timesteps increment param_2 value by a random walk
+    ```
+    **5)** Map parameter to their change rules
+
+    ```python
+    tunable_params = {
+        param_1: update_function_1,
+        param_2:  update_function_2,
+    }
+    ```
+    **6)** Define *how** the agent interacts with the environment**
+
+    ```python
+    ns_env = NSClassicControlWrapper(env, tunable_params, change_notification=True)
+    obs, info = ns_env.reset()
+    ```
+
+    Module 1 unpacks every one of these moving pieces — schedulers,
+    update functions, wrappers, notifications — and turns them into
+    sliders so you can build your own.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #5a3a8a; background: #f3eef7;"><div style="font-size: 2em; font-weight: 700; line-height: 1.2;">Stochastic Grid World Environments</div></div>
+
+    ## While NS-Gym can wrap several more complex environments, for this tutorial will will focus on two varations of discrete state and discrete action space stochastic gridworld environments -- the FrozenLake and the Bridge Environment
+
+
+    ## 1.** Interpretability**: Small state and action makes the behavior easier to analyze
+    ##2. **Solvablity**: We can exactly and tratably solve for optimal policies in both satationary and non-sationary cases
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.Html("""
+    <div style="
+        margin: 5em 0 1.5em 0;
+        padding: 2em 2em;
+        border-top: 6px solid #5a3a8a;
+        border-bottom: 6px solid #5a3a8a;
+        background: linear-gradient(180deg, #f3eef7, #faf7fd);
+    ">
+      <div style="font-size: 0.9em; opacity: 0.55;
+                  letter-spacing: 0.2em; font-weight: 600;
+                  color: #5a3a8a;">
+        INTERLUDE &middot; Mathematical preliminaries
+      </div>
+      <div style="font-size: 3em; font-weight: 800;
+                  margin-top: 0.25em; line-height: 1.05;">
+        Value iteration, oracle VI, and what we'll measure
+      </div>
+      <div style="font-size: 1em; opacity: 0.72;
+                  margin-top: 0.7em; max-width: 56em;">
+        Three planners whose behavior we will compare for the rest of
+        the tutorial. Defining them once now so the demos and metrics
+        in the next three modules don't need to re-explain the math.
+      </div>
+    </div>
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">1. Stationary value iteration</div></div>
+
+    For a stationary MDP $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$, the
+    optimal value function satisfies the Bellman optimality equation
+
+    $$
+    V^*(s) = \max_a \sum_{s'} P(s' \mid s, a)\,\bigl[R(s, a, s') + \gamma\, V^*(s')\bigr],
+    $$
+
+    and value iteration finds it as the fixed point of the Bellman
+    operator. The greedy policy is
+
+    $$
+    \pi^*(s) = \arg\max_a \sum_{s'} P(s' \mid s, a)\,\bigl[R(s, a, s') + \gamma\, V^*(s')\bigr].
+    $$
+
+    In a non-stationary world, $P$ and $R$ depend on $t$. **Stationary
+    VI ignores that** and solves the equation as if today's $P$ holds
+    forever. Three deployment patterns follow:
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">1b. Action-value (Q) function</div></div>
+
+    Closely related — and what every planner in this tutorial actually
+    *outputs* — is the **action-value function** $Q^*(s, a)$:
+
+    $$
+    Q^*(s, a) = \sum_{s'} P(s' \mid s, a)\,\bigl[R(s, a, s') + \gamma\, V^*(s')\bigr].
+    $$
+
+    By construction $V^*(s) = \max_a Q^*(s, a)$ and
+    $\pi^*(s) = \arg\max_a Q^*(s, a)$. The Q form is what tree-search
+    methods (MCTS, PA-MCTS, RATS) and DQN-style learners
+    *explicitly maintain* — UCB1 selects on $Q + \text{explore}$,
+    PA-MCTS mixes Q-values from the policy net and the tree, and DDQN
+    fits a neural $Q_\theta(s, a)$.
+
+    In the non-stationary version we'll write $Q^*_t(s, a)$ — the same
+    Bellman backup but using the time-indexed $P_t, R_t, V^*_{t+1}$.
+    The **Q-gap** metric used throughout the tutorial is
+
+    $$
+    \Delta_Q(s_t, t) \;=\; Q^*_t(s_t, a^*_t) - Q^*_t(s_t, a_{\text{taken},t}),
+    $$
+
+    i.e. the value the policy left on the table by *not* picking the
+    oracle's action at $(s_t, t)$. Cumulative $\Delta_Q$ is the
+    **regret** signal we plot in every scenario.
+
+    > **Aka *dynamic regret*.** What we call "Q-gap" here is the
+    > standard *dynamic regret* against a time-indexed optimum from the
+    > non-stationary RL literature — see Cheung, Simchi-Levi & Zhu,
+    > *Reinforcement Learning for Non-Stationary Markov Decision
+    > Processes: The Blessing of (More) Optimism*, ICML 2020,
+    > [PMLR 119:1843–1854](https://proceedings.mlr.press/v119/cheung20a.html).
+    > "Q-gap" is just a more intuitive label for the same quantity.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">2. Three planners we will compare</div></div>
+
+    | Planner | Plans against | Re-solves? | Knows future? |
+    |---|---|---|---|
+    | **Stale VI** | $P_0$ (initial transitions) | never | no |
+    | **Myopic replan VI** | current $P_t$ at each step | every step (or on notification) | no |
+    | **Oracle VI** | full $\{P_0, P_1, \dots, P_{T-1}\}$ | once, offline | yes (assumes the schedule is known) |
+
+    All three solve the same Bellman fixed point — they differ only in
+    the model they're handed. Stale never updates. Myopic re-solves on
+    the fly using the latest snapshot (`env.get_planning_env()`). Oracle
+    sees the entire $P_t$ trajectory in advance.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">3. Oracle / time-augmented VI</div></div>
+
+    Treat time as part of the state and run **backward induction** over
+    a horizon $T$:
+
+    $$
+    V^*(s, T) = 0,
+    $$
+    $$
+    V^*(s, t) = \max_a \sum_{s'} P_t(s' \mid s, a)\,\bigl[R_t(s, a, s') + \gamma\, V^*(s', t{+}1)\bigr],
+    $$
+    $$
+    \pi^*(s, t) = \arg\max_a \sum_{s'} P_t(s' \mid s, a)\,\bigl[R_t(s, a, s') + \gamma\, V^*(s', t{+}1)\bigr].
+    $$
+
+    This is the planner you would write if you knew the entire drift
+    schedule ahead of time. It's not deployable as a reactive agent —
+    no real system knows future $P_t$ — but it is the **upper bound**
+    every reactive method targets. The gap between any reactive
+    method and the oracle is the *price of not knowing the future*.
+
+    A reactive method (myopic replan, RATS, PA-MCTS, etc.) wants to
+    *close that gap* given only the current snapshot plus possibly
+    notifications about model changes.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">4. The metrics we will track</div></div>
+
+    For each rollout, we capture per-step traces (in the comp-template
+    style — `step_number`, `state`, `action`, `reward`, `notification`,
+    `decision_time`, `env_change`) plus two diagnostic series:
+
+    - **Parameter trajectory** — the value of the tunable parameter
+      ($P[\text{intended}]$ for FrozenLake / Bridge; gravity, masspole,
+      etc. for CartPole) at each step the agent visits. Different
+      policies traverse different states, so they see different
+      parameter histories.
+    - **Q-gap** — the value loss from picking the policy's action
+      instead of the oracle's:
+
+    $$
+    \Delta_Q(s_t, t) = Q^*_{\text{oracle}}(s_t, a^*_t) - Q^*_{\text{oracle}}(s_t, a_{\text{taken},t}).
+    $$
+
+    Cumulative $\Delta_Q$ over an episode is the **regret** against
+    the oracle baseline. Per-step $\Delta_Q$ is what the line plots
+    in the upcoming modules visualize.
+
+    These are the same instrumentation primitives the
+    `ns-gym-comp-template` evaluator records, just plotted live instead
+    of dumped to JSON.
     """)
     return
 
@@ -1238,178 +1458,6 @@ def _(ContinuousScheduler, fl_drift_pick, fl_make_gallery_update, plt):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.Html("""
-    <div style="
-        margin: 5em 0 1.5em 0;
-        padding: 2em 2em;
-        border-top: 6px solid #5a3a8a;
-        border-bottom: 6px solid #5a3a8a;
-        background: linear-gradient(180deg, #f3eef7, #faf7fd);
-    ">
-      <div style="font-size: 0.9em; opacity: 0.55;
-                  letter-spacing: 0.2em; font-weight: 600;
-                  color: #5a3a8a;">
-        INTERLUDE &middot; Mathematical preliminaries
-      </div>
-      <div style="font-size: 2.2em; font-weight: 800;
-                  margin-top: 0.25em; line-height: 1.05;">
-        Value iteration, oracle VI, and what we'll measure
-      </div>
-      <div style="font-size: 1em; opacity: 0.72;
-                  margin-top: 0.7em; max-width: 56em;">
-        Three planners whose behavior we will compare for the rest of
-        the tutorial. Defining them once now so the demos and metrics
-        in the next three modules don't need to re-explain the math.
-      </div>
-    </div>
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">1. Stationary value iteration</div></div>
-
-    For a stationary MDP $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$, the
-    optimal value function satisfies the Bellman optimality equation
-
-    $$
-    V^*(s) = \max_a \sum_{s'} P(s' \mid s, a)\,\bigl[R(s, a, s') + \gamma\, V^*(s')\bigr],
-    $$
-
-    and value iteration finds it as the fixed point of the Bellman
-    operator. The greedy policy is
-
-    $$
-    \pi^*(s) = \arg\max_a \sum_{s'} P(s' \mid s, a)\,\bigl[R(s, a, s') + \gamma\, V^*(s')\bigr].
-    $$
-
-    In a non-stationary world, $P$ and $R$ depend on $t$. **Stationary
-    VI ignores that** and solves the equation as if today's $P$ holds
-    forever. Three deployment patterns follow:
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">1b. Action-value (Q) function</div></div>
-
-    Closely related — and what every planner in this tutorial actually
-    *outputs* — is the **action-value function** $Q^*(s, a)$:
-
-    $$
-    Q^*(s, a) = \sum_{s'} P(s' \mid s, a)\,\bigl[R(s, a, s') + \gamma\, V^*(s')\bigr].
-    $$
-
-    By construction $V^*(s) = \max_a Q^*(s, a)$ and
-    $\pi^*(s) = \arg\max_a Q^*(s, a)$. The Q form is what tree-search
-    methods (MCTS, PA-MCTS, RATS) and DQN-style learners
-    *explicitly maintain* — UCB1 selects on $Q + \text{explore}$,
-    PA-MCTS mixes Q-values from the policy net and the tree, and DDQN
-    fits a neural $Q_\theta(s, a)$.
-
-    In the non-stationary version we'll write $Q^*_t(s, a)$ — the same
-    Bellman backup but using the time-indexed $P_t, R_t, V^*_{t+1}$.
-    The **Q-gap** metric used throughout the tutorial is
-
-    $$
-    \Delta_Q(s_t, t) \;=\; Q^*_t(s_t, a^*_t) - Q^*_t(s_t, a_{\text{taken},t}),
-    $$
-
-    i.e. the value the policy left on the table by *not* picking the
-    oracle's action at $(s_t, t)$. Cumulative $\Delta_Q$ is the
-    **regret** signal we plot in every scenario.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">2. Three planners we will compare</div></div>
-
-    | Planner | Plans against | Re-solves? | Knows future? |
-    |---|---|---|---|
-    | **Stale VI** | $P_0$ (initial transitions) | never | no |
-    | **Myopic replan VI** | current $P_t$ at each step | every step (or on notification) | no |
-    | **Oracle VI** | full $\{P_0, P_1, \dots, P_{T-1}\}$ | once, offline | yes (assumes the schedule is known) |
-
-    All three solve the same Bellman fixed point — they differ only in
-    the model they're handed. Stale never updates. Myopic re-solves on
-    the fly using the latest snapshot (`env.get_planning_env()`). Oracle
-    sees the entire $P_t$ trajectory in advance.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">3. Oracle / time-augmented VI</div></div>
-
-    Treat time as part of the state and run **backward induction** over
-    a horizon $T$:
-
-    $$
-    V^*(s, T) = 0,
-    $$
-    $$
-    V^*(s, t) = \max_a \sum_{s'} P_t(s' \mid s, a)\,\bigl[R_t(s, a, s') + \gamma\, V^*(s', t{+}1)\bigr],
-    $$
-    $$
-    \pi^*(s, t) = \arg\max_a \sum_{s'} P_t(s' \mid s, a)\,\bigl[R_t(s, a, s') + \gamma\, V^*(s', t{+}1)\bigr].
-    $$
-
-    This is the planner you would write if you knew the entire drift
-    schedule ahead of time. It's not deployable as a reactive agent —
-    no real system knows future $P_t$ — but it is the **upper bound**
-    every reactive method targets. The gap between any reactive
-    method and the oracle is the *price of not knowing the future*.
-
-    A reactive method (myopic replan, RATS, PA-MCTS, etc.) wants to
-    *close that gap* given only the current snapshot plus possibly
-    notifications about model changes.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">4. The metrics we will track</div></div>
-
-    For each rollout, we capture per-step traces (in the comp-template
-    style — `step_number`, `state`, `action`, `reward`, `notification`,
-    `decision_time`, `env_change`) plus two diagnostic series:
-
-    - **Parameter trajectory** — the value of the tunable parameter
-      ($P[\text{intended}]$ for FrozenLake / Bridge; gravity, masspole,
-      etc. for CartPole) at each step the agent visits. Different
-      policies traverse different states, so they see different
-      parameter histories.
-    - **Q-gap** — the value loss from picking the policy's action
-      instead of the oracle's:
-
-    $$
-    \Delta_Q(s_t, t) = Q^*_{\text{oracle}}(s_t, a^*_t) - Q^*_{\text{oracle}}(s_t, a_{\text{taken},t}).
-    $$
-
-    Cumulative $\Delta_Q$ over an episode is the **regret** against
-    the oracle baseline. Per-step $\Delta_Q$ is what the line plots
-    in the upcoming modules visualize.
-
-    These are the same instrumentation primitives the
-    `ns-gym-comp-template` evaluator records, just plotted live instead
-    of dumped to JSON.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
     mo.md(r"""
     <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #1a1a1a; background: #efefef;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">Your NS-MDP — combine the two galleries</div></div>
 
@@ -1424,6 +1472,28 @@ def _(mo):
     update reactively whenever you change a dropdown — no code, no
     re-runs. Try a quiet schedule with a violent drift, a periodic
     schedule with a slow drift, etc.
+
+    > **★ Heatmap mode matters.** The default **V\\***  panels show each
+    > planner's *self-evaluated* value: stale and myopic both solve
+    > infinite-horizon stationary VI on a snapshotted `P`, while oracle
+    > does finite-horizon backward induction on the full schedule. Those
+    > are **different objectives on different horizons** — the values
+    > are not directly comparable across panels. Switch the
+    > **heatmap mode** dropdown to:
+    >
+    > - **V^π under truth** — backward-pass policy evaluation of each
+    >   planner's policy on the *true* non-stationary tensor (no max,
+    >   just plug in π). All three are then expected return under the
+    >   same dynamics over the same horizon — apples-to-apples, and
+    >   the panel-to-panel gap is exactly the policy-quality gap that
+    >   the bar plot below measures.
+    > - **Action gap** — `max_a Q*(s,a,t) − second_max_a Q*`. Where
+    >   the gap is large the optimal action is decisive (picking
+    >   wrong costs a lot); where it's small, multiple actions are
+    >   roughly tied. Invariant to horizon scaling. The colormap is
+    >   shared across all three panels (it's the *same* gap field);
+    >   the arrows on each panel are that planner's policy, so you
+    >   can spot disagreements on cells where the gap actually matters.
 
     > **★ Recipe for visible oracle ≠ myopic divergence:**
     > pick **`ContinuousScheduler`** + **`★ SigmoidEarlyCliff(t0=4, k=1.0)`**.
@@ -1493,18 +1563,85 @@ def _(fl_oracle_gamma, fl_your_P, fl_your_R, ns_oracle_vi):
 
 
 @app.cell
-def _(fl_oracle_gamma, fl_your_P, fl_your_R, np, stationary_vi_jit):
+def _(
+    fl_oracle_gamma,
+    fl_stationary_V,
+    fl_stationary_policy,
+    fl_your_P,
+    fl_your_R,
+    np,
+    stationary_vi_jit,
+):
+    """Myopic-replan agent's plan at each decision time.
+
+    At decision time t the agent has observed the env state *after*
+    step t-1 — i.e., the table that was in force during the (t-1)-th
+    transition (= ``fl_your_P[t-1]`` after the build_ns_tensors fix).
+    For t=0 the agent has taken no steps yet and uses the initial
+    (stale) plan — matching what ``fl_replan_rollout`` actually passes
+    as ``initial_policy``. So at t=0, myopic ≡ stale by construction.
+    """
     _T = fl_your_P.shape[0]
     _S = fl_your_P.shape[1]
     fl_your_myopic_V = np.zeros((_T, _S))
     fl_your_myopic_policy = np.zeros((_T, _S), dtype=np.int64)
-    for _t in range(_T):
+    fl_your_myopic_V[0] = fl_stationary_V
+    fl_your_myopic_policy[0] = fl_stationary_policy.astype(np.int64)
+    for _t in range(1, _T):
         _v, _pi = stationary_vi_jit(
-            fl_your_P[_t], fl_your_R[_t], fl_oracle_gamma,
+            fl_your_P[_t - 1], fl_your_R[_t - 1], fl_oracle_gamma,
         )
         fl_your_myopic_V[_t] = _v
         fl_your_myopic_policy[_t] = _pi
     return fl_your_myopic_V, fl_your_myopic_policy
+
+
+@app.cell
+def _(
+    fl_oracle_gamma,
+    fl_stationary_policy,
+    fl_your_P,
+    fl_your_R,
+    fl_your_myopic_policy,
+    fl_your_oracle_policy,
+    np,
+    oracle_q_gap_jit,
+    policy_eval_ns_jit,
+):
+    """Apples-to-apples evaluation: each planner's policy under truth.
+
+    V^π_*(s, t) is the expected return from (s, t) when actions follow
+    the planner's policy AND dynamics follow the true (P_t, R_t). Unlike
+    V*, all three are on the same horizon and same env, so panel-to-panel
+    differences reflect policy quality alone.
+    """
+    _T = fl_your_P.shape[0]
+    _S = fl_your_P.shape[1]
+    # Stale policy is constant in t — broadcast (S,) → (T, S).
+    _stale_pi_tt = np.broadcast_to(
+        fl_stationary_policy.astype(np.int64), (_T, _S)
+    ).copy()
+    fl_your_stale_Vpi = policy_eval_ns_jit(
+        fl_your_P, fl_your_R, fl_oracle_gamma, _stale_pi_tt,
+    )
+    fl_your_myopic_Vpi = policy_eval_ns_jit(
+        fl_your_P, fl_your_R, fl_oracle_gamma,
+        fl_your_myopic_policy.astype(np.int64),
+    )
+    fl_your_oracle_Vpi = policy_eval_ns_jit(
+        fl_your_P, fl_your_R, fl_oracle_gamma,
+        fl_your_oracle_policy.astype(np.int64),
+    )
+    # Oracle Q* and action gap (max − second-best Q*) at each (s, t).
+    fl_your_oracle_Q, fl_your_oracle_gap = oracle_q_gap_jit(
+        fl_your_P, fl_your_R, fl_oracle_gamma,
+    )
+    return (
+        fl_your_myopic_Vpi,
+        fl_your_oracle_Vpi,
+        fl_your_oracle_gap,
+        fl_your_stale_Vpi,
+    )
 
 
 @app.cell
@@ -1513,8 +1650,17 @@ def _(fl_oracle_horizon, mo):
         start=0, stop=fl_oracle_horizon - 1, step=1, value=0,
         label="your-NS-MDP time t",
     )
-    fl_your_t
-    return (fl_your_t,)
+    fl_your_view = mo.ui.dropdown(
+        options=[
+            "V*  —  each planner's self-eval (different horizons, NOT comparable)",
+            "V^π  —  policy evaluated under truth (apples-to-apples)",
+            "Action gap  —  max Q* − second-best Q* (oracle, shared scale)",
+        ],
+        value="V*  —  each planner's self-eval (different horizons, NOT comparable)",
+        label="heatmap mode",
+    )
+    mo.hstack([fl_your_t, fl_your_view], justify="start", gap=2)
+    return fl_your_t, fl_your_view
 
 
 @app.cell
@@ -1527,41 +1673,86 @@ def _(
     fl_stationary_V,
     fl_stationary_policy,
     fl_your_myopic_V,
+    fl_your_myopic_Vpi,
     fl_your_myopic_policy,
     fl_your_oracle_V,
+    fl_your_oracle_Vpi,
+    fl_your_oracle_gap,
     fl_your_oracle_policy,
+    fl_your_stale_Vpi,
     fl_your_t,
+    fl_your_view,
     plt,
 ):
     _t = fl_your_t.value
-    _vmax = max(
-        float(fl_stationary_V.max()),
-        float(fl_your_oracle_V[0].max()),
-        float(fl_your_myopic_V[0].max()),
-        1e-3,
-    )
+    _mode = fl_your_view.value
+
+    # Pick the heatmap data + label based on the mode. All three planners
+    # share a common color scale per mode for fair side-by-side reading.
+    if _mode.startswith("V^π"):
+        # V^π under truth: backward-pass policy evaluation on (P_t, R_t).
+        _grid_stale = fl_your_stale_Vpi[_t].reshape(4, 4)
+        _grid_myopic = fl_your_myopic_Vpi[_t].reshape(4, 4)
+        _grid_oracle = fl_your_oracle_Vpi[_t].reshape(4, 4)
+        _vmax = max(
+            float(fl_your_stale_Vpi[0].max()),
+            float(fl_your_myopic_Vpi[0].max()),
+            float(fl_your_oracle_Vpi[0].max()),
+            1e-3,
+        )
+        _row_label = f"V^π(s, t={_t})  under truth"
+        _t_stale_v = f"Stale  V^π(s, t={_t})"
+        _t_myopic_v = f"Myopic replan  V^π(s, t={_t})"
+        _t_oracle_v = f"Oracle  V^π(s, t={_t})"
+    elif _mode.startswith("Action gap"):
+        # Oracle action gap (max Q* − second-best Q*) — single source of
+        # truth, shared across all three panels with each planner's arrows.
+        _gap = fl_your_oracle_gap[_t].reshape(4, 4)
+        _grid_stale = _gap
+        _grid_myopic = _gap
+        _grid_oracle = _gap
+        _vmax = max(float(fl_your_oracle_gap.max()), 1e-3)
+        _row_label = f"Action gap (oracle Q*) at t={_t}"
+        _t_stale_v = f"Stale  arrows on gap (t={_t})"
+        _t_myopic_v = f"Myopic  arrows on gap (t={_t})"
+        _t_oracle_v = f"Oracle  arrows on gap (t={_t})"
+    else:
+        # Default: V* (each planner's self-evaluated value).
+        _grid_stale = fl_stationary_V.reshape(4, 4)
+        _grid_myopic = fl_your_myopic_V[_t].reshape(4, 4)
+        _grid_oracle = fl_your_oracle_V[_t].reshape(4, 4)
+        _vmax = max(
+            float(fl_stationary_V.max()),
+            float(fl_your_oracle_V[0].max()),
+            float(fl_your_myopic_V[0].max()),
+            1e-3,
+        )
+        _row_label = "V*(s,t)  (different horizons — NOT comparable)"
+        _t_stale_v = "Stale VI   (no updates)"
+        _t_myopic_v = f"Myopic replan   V(s, t={_t})"
+        _t_oracle_v = f"Oracle VI   V(s, t={_t})"
 
     _fig, _axes = plt.subplots(2, 3, figsize=(13.5, 8.6), layout="constrained")
-    # Top row — V(s, t) heatmaps (with arrows)
+    # Top row — heatmap (with arrows). Arrows are always the planner's policy.
     fl_draw_value_panel(
         _axes[0, 0],
-        fl_stationary_V.reshape(4, 4),
+        _grid_stale,
         fl_stationary_policy.reshape(4, 4),
-        "Stale VI   (no updates)",
+        _t_stale_v,
         vmax=_vmax,
     )
     fl_draw_value_panel(
         _axes[0, 1],
-        fl_your_myopic_V[_t].reshape(4, 4),
+        _grid_myopic,
         fl_your_myopic_policy[_t].reshape(4, 4),
-        f"Myopic replan   V(s, t={_t})",
+        _t_myopic_v,
         vmax=_vmax,
     )
     _im_v = fl_draw_value_panel(
         _axes[0, 2],
-        fl_your_oracle_V[_t].reshape(4, 4),
+        _grid_oracle,
         fl_your_oracle_policy[_t].reshape(4, 4),
-        f"Oracle VI   V(s, t={_t})",
+        _t_oracle_v,
         vmax=_vmax,
     )
     # Bottom row — π(s, t) color-coded action heatmaps
@@ -1585,7 +1776,7 @@ def _(
     _short_drift = fl_drift_pick.value.split(" — ")[0].split("(")[0].strip()
     _fig.suptitle(
         f"YOUR env  •  {_short_sched}  ×  {_short_drift}  •  "
-        f"top: V(s,t)   bottom: π(s,t)",
+        f"top: {_row_label}   bottom: π(s,t)",
         fontsize=10,
     )
     _fig.colorbar(_im_v, ax=_axes[0, :], fraction=0.025, pad=0.02)
@@ -1603,8 +1794,19 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #555; background: #f6f6f6;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Performance — stale vs replan vs oracle on your env</div></div>
 
-    30 episodes per planner, same drift schedule, fresh RNGs per episode.
-    Bars show per-episode return; the dashed line is the planner mean.
+    **100 episodes** per planner, same drift schedule, fresh RNGs per
+    episode. Bar plots compress out the distribution and a μ-difference
+    smaller than ~2·SE on FrozenLake's binary reward (≈ 0.10 at N=100)
+    is just noise. We show two views instead:
+
+    - **Left — return distribution per planner.** Violin shape carries
+      the median, IQR and the long tail of zeros. The dot marks the
+      mean; the annotation gives success rate over all seeds.
+    - **Right — paired difference.** For each seed, *(oracle − stale)*
+      and *(oracle − replan)*. Dots above 0 mean oracle wins on that
+      seed; dots below 0 are the surprising losses you noticed. The
+      vertical band is the mean ± SE of the per-seed difference — a
+      proper paired test of "does foresight buy something here?"
     """)
     return
 
@@ -1621,13 +1823,19 @@ def _(
     fl_vi_policy,
     fl_your_make_env,
     fl_your_oracle_policy,
+    mo,
     np,
     plt,
 ):
     _ = fl_oracle_policy  # silence unused import; we use fl_your_oracle_policy
-    _seeds = list(range(30))
+    _N_SEEDS = 100
+    _seeds = list(range(_N_SEEDS))
     _stale, _replan, _oracle = [], [], []
-    for _s in _seeds:
+    for _s in mo.status.progress_bar(
+        _seeds, title="Stale vs replan vs oracle on your env",
+        subtitle=f"rolling out 3 planners × {_N_SEEDS} seeds…",
+        remove_on_exit=True,
+    ):
         _env_a = fl_your_make_env()
         _env_b = fl_your_make_env()
         _env_c = fl_your_make_env()
@@ -1637,33 +1845,101 @@ def _(
         _rb, _ = fl_replan_rollout(_env_b, fl_stationary_policy, seed=_s)
         np.random.seed(_s)
         _rc = fl_oracle_rollout(_env_c, fl_your_oracle_policy, seed=_s)
-        _stale.append(_ra)
-        _replan.append(_rb)
-        _oracle.append(_rc)
+        _stale.append(float(_ra))
+        _replan.append(float(_rb))
+        _oracle.append(float(_rc))
+    _stale_a = np.asarray(_stale)
+    _replan_a = np.asarray(_replan)
+    _oracle_a = np.asarray(_oracle)
 
-    _fig, _ax = plt.subplots(figsize=(8, 3.4))
-    _w = 0.27
-    _idx = np.arange(len(_seeds))
-    _ax.bar(_idx - _w, _stale, _w, color="tab:red",
-            label=f"stale-VI  (μ={np.mean(_stale):.2f})")
-    _ax.bar(_idx, _replan, _w, color="tab:blue",
-            label=f"replan-VI  (μ={np.mean(_replan):.2f})")
-    _ax.bar(_idx + _w, _oracle, _w, color="tab:green",
-            label=f"oracle-VI  (μ={np.mean(_oracle):.2f})")
-    for _vals, _color in [(_stale, "tab:red"),
-                          (_replan, "tab:blue"),
-                          (_oracle, "tab:green")]:
-        _ax.axhline(np.mean(_vals), color=_color, linestyle="--", alpha=0.4)
-    _ax.set_xlabel("episode seed")
-    _ax.set_ylabel("return (1 = success)")
-    _ax.set_ylim(-0.05, 1.05)
+    _fig, (_ax_v, _ax_d) = plt.subplots(
+        1, 2, figsize=(11.5, 3.8), layout="constrained",
+    )
+
+    # --- Left: violin plot of return distributions ----------------
+    _data = [_stale_a, _replan_a, _oracle_a]
+    _names = ["stale-VI", "replan-VI", "oracle-VI"]
+    _colors = ["tab:red", "tab:blue", "tab:green"]
+    _vp = _ax_v.violinplot(
+        _data, positions=[0, 1, 2], showmeans=False,
+        showmedians=False, showextrema=False, widths=0.75,
+    )
+    for _body, _col in zip(_vp["bodies"], _colors):
+        _body.set_facecolor(_col)
+        _body.set_edgecolor("black")
+        _body.set_alpha(0.55)
+        _body.set_linewidth(0.6)
+    # Mean dot + SE bar for each violin.
+    for _i, (_arr, _col) in enumerate(zip(_data, _colors)):
+        _mu = float(np.mean(_arr))
+        _se = float(np.std(_arr, ddof=1) / np.sqrt(len(_arr)))
+        _ax_v.errorbar(
+            _i, _mu, yerr=_se, fmt="o", color="white",
+            markerfacecolor=_col, markeredgecolor="black",
+            markersize=8, capsize=4, zorder=5,
+        )
+        _succ = int(np.sum(_arr > 0))
+        _ax_v.text(
+            _i, 1.08,
+            f"μ={_mu:.2f}±{_se:.02f}\n{_succ}/{_N_SEEDS} succ",
+            ha="center", va="bottom", fontsize=8,
+        )
+    _ax_v.set_xticks([0, 1, 2])
+    _ax_v.set_xticklabels(_names, fontsize=9)
+    _ax_v.set_ylabel("return  (1 = goal reached)")
+    _ax_v.set_ylim(-0.1, 1.3)
+    _ax_v.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
+    _ax_v.axhline(1, color="grey", linewidth=0.5, alpha=0.4)
+    _ax_v.set_title(
+        f"Return distribution  (violins, N={_N_SEEDS})", fontsize=10,
+    )
+
+    # --- Right: paired-diff strip plot ---------------------------
+    _diff_oracle_stale = _oracle_a - _stale_a
+    _diff_oracle_replan = _oracle_a - _replan_a
+    _diffs = [_diff_oracle_stale, _diff_oracle_replan]
+    _diff_names = ["oracle − stale", "oracle − replan"]
+    _diff_colors = ["tab:red", "tab:blue"]  # color of the *baseline*
+    _rng = np.random.default_rng(0)
+    for _i, (_d, _col) in enumerate(zip(_diffs, _diff_colors)):
+        _xs = _i + (_rng.uniform(-0.16, 0.16, size=len(_d)))
+        _ax_d.scatter(
+            _xs, _d, s=18, alpha=0.55, color=_col,
+            edgecolor="black", linewidth=0.3,
+        )
+        _mu = float(np.mean(_d))
+        _se = float(np.std(_d, ddof=1) / np.sqrt(len(_d)))
+        _wins = int(np.sum(_d > 0))
+        _losses = int(np.sum(_d < 0))
+        _ax_d.errorbar(
+            _i, _mu, yerr=_se, fmt="D", color="white",
+            markerfacecolor="black", markeredgecolor="black",
+            markersize=7, capsize=5, zorder=5,
+        )
+        _ax_d.text(
+            _i, 1.18,
+            f"μ_diff={_mu:+.2f}±{_se:.02f}\n"
+            f"oracle wins {_wins}/{_N_SEEDS}  ·  "
+            f"loses {_losses}/{_N_SEEDS}",
+            ha="center", va="bottom", fontsize=8,
+        )
+    _ax_d.axhline(0, color="grey", linewidth=0.8)
+    _ax_d.set_xticks([0, 1])
+    _ax_d.set_xticklabels(_diff_names, fontsize=9)
+    _ax_d.set_ylabel("per-seed return diff")
+    _ax_d.set_ylim(-1.4, 1.4)
+    _ax_d.set_title(
+        "Paired difference per seed  (above 0 → oracle wins)",
+        fontsize=10,
+    )
+
     _short_sched = fl_sched_pick.value.split(" — ")[0].split("(")[0].strip()
     _short_drift = fl_drift_pick.value.split(" — ")[0].split("(")[0].strip()
-    _ax.set_title(
-        f"YOUR env  •  {_short_sched}  ×  {_short_drift}"
+    _fig.suptitle(
+        f"YOUR env  •  {_short_sched}  ×  {_short_drift}  •  "
+        f"N={_N_SEEDS}",
+        fontsize=10,
     )
-    _ax.legend(fontsize=8, loc="upper right")
-    _fig.tight_layout()
     _fig
     return
 
@@ -1682,137 +1958,6 @@ def _(mo):
        snapshot reflects up-to-date parameters; without them you get a
        snapshot of the base env. Used by planning algorithms like MCTS.
     """)
-    return
-
-
-# ============================================================
-# INTERACTIVE — notification-level toggle, same MCTS, 3 rollouts
-# ============================================================
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #1a1a1a; background: #efefef;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">Try it — same MCTS, three notification levels</div></div>
-
-    Same env, same drift, same seed, same MCTS planner — but three
-    notification levels. The agent's only difference is *what
-    `get_planning_env()` hands it*. Click run to see how the planner's
-    behavior diverges when you blind it.
-
-    Left panel: cumulative reward each level achieves. Right panel:
-    the **slip probability the planner *thinks* it's facing** at each
-    step. Watch the `none` level get stuck on $\theta_0$ forever
-    while `delta_change_notification` tracks the live $\theta_t$.
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    fl_notif_run = mo.ui.run_button(
-        label="▶ Roll MCTS at all 3 notification levels"
-    )
-    fl_notif_run
-    return (fl_notif_run,)
-
-
-@app.cell
-def _(
-    ContinuousScheduler,
-    DistributionDecrementUpdate,
-    NSFrozenLakeWrapper,
-    fl_init_intended,
-    fl_notif_run,
-    gym,
-    init_dist,
-    mo,
-    np,
-    plt,
-    type_mismatch_checker,
-):
-    if not fl_notif_run.value:
-        _out = mo.md("_Click the run button to launch the comparison._")
-    else:
-        from ns_gym.benchmark_algorithms import MCTS as _MCTS
-
-        def _make_env(change_notif, delta_notif):
-            base = gym.make(
-                "FrozenLake-v1", is_slippery=False, max_episode_steps=50,
-            )
-            sched = ContinuousScheduler()
-            update_fn = DistributionDecrementUpdate(scheduler=sched, k=0.10)
-            return NSFrozenLakeWrapper(
-                base, {"P": update_fn},
-                change_notification=change_notif,
-                delta_change_notification=delta_notif,
-                initial_prob_dist=init_dist(fl_init_intended.value),
-            )
-
-        _levels = [
-            ("none",                 False, False, "tab:red"),
-            ("change_notification",  True,  False, "tab:orange"),
-            ("delta_change_notification", True, True, "tab:green"),
-        ]
-        _MAX = 30
-        _SEED = 0
-        _traces = {}
-
-        for _label, _cn, _dn, _color in _levels:
-            np.random.seed(_SEED)
-            _env = _make_env(_cn, _dn)
-            _obs, _ = _env.reset(seed=_SEED)
-            _state, _ = type_mismatch_checker(_obs)
-            _cum_r = []
-            _planner_p = []
-            _cur = 0.0
-            _done = _trunc = False
-            _t = 0
-            while not (_done or _trunc) and _t < _MAX:
-                _penv = _env.get_planning_env()
-                # what does the planner *think* the slip distribution is?
-                _planner_p.append(float(_penv.transition_prob[0]))
-                _agent = _MCTS(
-                    _penv, state=int(_state),
-                    d=15, m=20, c=1.4, gamma=0.95,
-                )
-                _a, _ = _agent.search()
-                _obs, _reward, _done, _trunc, _ = _env.step(int(_a))
-                _state, _reward = type_mismatch_checker(_obs, _reward)
-                _cur += float(_reward)
-                _cum_r.append(_cur)
-                _t += 1
-            # carry-forward to fixed length
-            while len(_cum_r) < _MAX:
-                _cum_r.append(_cur)
-                _planner_p.append(_planner_p[-1])
-            _traces[_label] = (_cum_r, _planner_p, _color)
-
-        _fig, (_ax_r, _ax_p) = plt.subplots(
-            1, 2, figsize=(11, 3.4), layout="constrained",
-        )
-        for _label, (_r, _p, _c) in _traces.items():
-            _ax_r.plot(_r, label=_label, color=_c, linewidth=1.8,
-                       marker="o", markersize=3)
-            _ax_p.plot(_p, label=_label, color=_c, linewidth=1.8,
-                       marker="o", markersize=3)
-        _ax_r.set_xlabel("step")
-        _ax_r.set_ylabel("cumulative reward")
-        _ax_r.set_title(
-            "MCTS return vs. notification level  (same seed, same drift)",
-            fontsize=10,
-        )
-        _ax_r.set_ylim(-0.05, 1.05)
-        _ax_r.legend(fontsize=8, loc="lower right")
-        _ax_p.set_xlabel("step")
-        _ax_p.set_ylabel(r"$P[\text{intended}]$ in the planning env")
-        _ax_p.set_title(
-            "What slip prob does the planner think it's facing?",
-            fontsize=10,
-        )
-        _ax_p.set_ylim(-0.05, 1.05)
-        _ax_p.legend(fontsize=8, loc="upper right")
-        _out = _fig
-    _out
     return
 
 
@@ -1889,10 +2034,6 @@ def _(fl_user_scheduler_cls):
     _out
     return
 
-
-# ============================================================
-# Your turn — custom update function (mirrors the scheduler activity)
-# ============================================================
 
 @app.cell(hide_code=True)
 def _(mo):
@@ -2055,9 +2196,16 @@ def _(
     np,
     save_sweep,
 ):
+    import time as _time
     fl_sweep = None
     fl_sweep_path = None
-    if fl_run_sweep.value:
+    if not fl_run_sweep.value:
+        _status = mo.md(
+            "_Click **Run FrozenLake sweep** above to run the "
+            "random-policy baseline (~10 s)._"
+        )
+    else:
+        _t0 = _time.time()
         _ks = np.linspace(0.0, 0.3, 7)
         _returns_by_k = {}
         for _k in mo.status.progress_bar(
@@ -2080,7 +2228,11 @@ def _(
             "returns_by_k": _returns_by_k,
         }
         fl_sweep_path = save_sweep("nb_1_frozenlake.json", fl_sweep)
-    _ = (fl_sweep, fl_sweep_path)
+        _status = mo.md(
+            f"✓ Sweep finished in **{_time.time() - _t0:.1f} s** — "
+            f"7 drift levels × 30 episodes. Saved to `{fl_sweep_path}`."
+        )
+    _status
     return (fl_sweep,)
 
 
@@ -2221,6 +2373,30 @@ def _(DRIFT_OPTIONS, mo):
 
         Uncheck the box to fall back to global-P drift (uses the main
         `fl_drift_pick` selection above).
+
+        > **★ Heatmap mode matters (same caveat as the FrozenLake
+        > panel).** The default **V\\***  panels show each planner's
+        > self-evaluated value: stale and myopic both solve infinite-
+        > horizon stationary VI on a snapshotted `P`, while oracle
+        > does finite-horizon backward induction on the full schedule.
+        > Those are **different objectives on different horizons** —
+        > the values are not directly comparable across panels.
+        > Switch the **heatmap mode** dropdown to:
+        >
+        > - **V^π under truth** — backward-pass policy evaluation of
+        >   each planner's policy on the *true* non-stationary tensor
+        >   (no max, just plug in π). All three are then expected
+        >   return under the same dynamics over the same horizon —
+        >   apples-to-apples; the panel-to-panel gap is exactly the
+        >   policy-quality gap that the bar plot below measures.
+        > - **Action gap** — `max_a Q*(s,a,t) − second_max_a Q*`.
+        >   Where the gap is large the optimal action is decisive
+        >   (picking wrong costs a lot); where it's small, multiple
+        >   actions are roughly tied. Invariant to horizon scaling.
+        >   The colormap is shared across all three panels (same gap
+        >   field); the arrows on each panel are that planner's policy,
+        >   so you can spot disagreements on cells where the gap
+        >   actually matters.
         """),
         bridge_split_sides,
         bridge_left_drift,
@@ -2297,21 +2473,23 @@ def _(
 @app.cell
 def _(np):
     def build_bridge_tensors(make_env_fn, T, seed=0):
-        """Snapshot Bridge transition tensors at each of T timesteps."""
-        _probe = make_env_fn()
-        _probe.reset(seed=seed)
-        n_states = _probe.unwrapped.observation_space.n
-        n_actions = _probe.unwrapped.action_space.n
+        """Snapshot Bridge transition tensors at each of T timesteps.
+
+        NSBridgeWrapper.step calls ``_step_update`` BEFORE the real
+        transition, so the table that governs the agent's t-th step is
+        the one after ``_step_update`` has run with ``self.t == t``. We
+        replay this in-place on a single env (setting ``self.t = t``
+        manually) and snapshot the resulting transition matrix.
+        """
+        env = make_env_fn()
+        env.reset(seed=seed)
+        n_states = env.unwrapped.observation_space.n
+        n_actions = env.unwrapped.action_space.n
         P = np.zeros((T, n_states, n_actions, n_states), dtype=np.float64)
         R = np.zeros((T, n_states, n_actions, n_states), dtype=np.float64)
         for t in range(T):
-            env = make_env_fn()
-            env.reset(seed=seed)
-            for _ in range(t):
-                try:
-                    env.step(0)
-                except Exception:
-                    break
+            env.t = t
+            env._step_update()
             T_dict = env.unwrapped._get_transition_matrix()
             for s in range(n_states):
                 for a in range(n_actions):
@@ -2341,18 +2519,77 @@ def _(bridge_P, bridge_R, fl_oracle_gamma, ns_oracle_vi):
 
 
 @app.cell
-def _(bridge_P, bridge_R, fl_oracle_gamma, np, stationary_vi_jit):
+def _(
+    bridge_P,
+    bridge_R,
+    bridge_stationary_V,
+    bridge_stationary_policy,
+    fl_oracle_gamma,
+    np,
+    stationary_vi_jit,
+):
+    """Myopic-replan agent's plan at each decision time on Bridge.
+
+    At decision time t the agent has only observed the env state *after*
+    step t-1 — i.e., the table that was in force during the (t-1)-th
+    transition (= ``bridge_P[t-1]`` after the build_bridge_tensors fix).
+    For t=0 the agent has taken no steps yet and uses the initial
+    (stale) plan, matching what the rollouts pass as ``initial_policy``.
+    So at t=0, myopic ≡ stale by construction.
+    """
     _T = bridge_P.shape[0]
     _S = bridge_P.shape[1]
     bridge_myopic_V = np.zeros((_T, _S))
     bridge_myopic_policy = np.zeros((_T, _S), dtype=np.int64)
-    for _t in range(_T):
+    bridge_myopic_V[0] = bridge_stationary_V
+    bridge_myopic_policy[0] = bridge_stationary_policy.astype(np.int64)
+    for _t in range(1, _T):
         _v, _pi = stationary_vi_jit(
-            bridge_P[_t], bridge_R[_t], fl_oracle_gamma,
+            bridge_P[_t - 1], bridge_R[_t - 1], fl_oracle_gamma,
         )
         bridge_myopic_V[_t] = _v
         bridge_myopic_policy[_t] = _pi
     return bridge_myopic_V, bridge_myopic_policy
+
+
+@app.cell
+def _(
+    bridge_P,
+    bridge_R,
+    bridge_myopic_policy,
+    bridge_oracle_policy,
+    bridge_stationary_policy,
+    fl_oracle_gamma,
+    np,
+    oracle_q_gap_jit,
+    policy_eval_ns_jit,
+):
+    """Bridge — apples-to-apples evaluation under truth + oracle action gap."""
+    _T = bridge_P.shape[0]
+    _S = bridge_P.shape[1]
+    _stale_pi_tt = np.broadcast_to(
+        bridge_stationary_policy.astype(np.int64), (_T, _S)
+    ).copy()
+    bridge_stale_Vpi = policy_eval_ns_jit(
+        bridge_P, bridge_R, fl_oracle_gamma, _stale_pi_tt,
+    )
+    bridge_myopic_Vpi = policy_eval_ns_jit(
+        bridge_P, bridge_R, fl_oracle_gamma,
+        bridge_myopic_policy.astype(np.int64),
+    )
+    bridge_oracle_Vpi = policy_eval_ns_jit(
+        bridge_P, bridge_R, fl_oracle_gamma,
+        bridge_oracle_policy.astype(np.int64),
+    )
+    bridge_oracle_Q, bridge_oracle_gap = oracle_q_gap_jit(
+        bridge_P, bridge_R, fl_oracle_gamma,
+    )
+    return (
+        bridge_myopic_Vpi,
+        bridge_oracle_Vpi,
+        bridge_oracle_gap,
+        bridge_stale_Vpi,
+    )
 
 
 @app.cell
@@ -2361,8 +2598,17 @@ def _(fl_oracle_horizon, mo):
         start=0, stop=fl_oracle_horizon - 1, step=1, value=0,
         label="Bridge time t",
     )
-    bridge_t
-    return (bridge_t,)
+    bridge_view = mo.ui.dropdown(
+        options=[
+            "V*  —  each planner's self-eval (different horizons, NOT comparable)",
+            "V^π  —  policy evaluated under truth (apples-to-apples)",
+            "Action gap  —  max Q* − second-best Q* (oracle, shared scale)",
+        ],
+        value="V*  —  each planner's self-eval (different horizons, NOT comparable)",
+        label="heatmap mode",
+    )
+    mo.hstack([bridge_t, bridge_view], justify="start", gap=2)
+    return bridge_t, bridge_view
 
 
 @app.cell
@@ -2443,49 +2689,88 @@ def _(
     bridge_draw_policy_panel,
     bridge_draw_value_panel,
     bridge_myopic_V,
+    bridge_myopic_Vpi,
     bridge_myopic_policy,
     bridge_oracle_V,
+    bridge_oracle_Vpi,
+    bridge_oracle_gap,
     bridge_oracle_policy,
+    bridge_stale_Vpi,
     bridge_stationary_V,
     bridge_stationary_policy,
     bridge_t,
+    bridge_view,
     fl_drift_pick,
     fl_sched_pick,
     plt,
 ):
     _t = bridge_t.value
-    _vmax = max(
-        float(bridge_stationary_V.max()),
-        float(bridge_oracle_V[0].max()),
-        float(bridge_myopic_V[0].max()),
-        1e-3,
-    )
+    _mode = bridge_view.value
+
+    if _mode.startswith("V^π"):
+        _grid_stale = bridge_stale_Vpi[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
+        _grid_myopic = bridge_myopic_Vpi[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
+        _grid_oracle = bridge_oracle_Vpi[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
+        _vmax = max(
+            float(bridge_stale_Vpi[0].max()),
+            float(bridge_myopic_Vpi[0].max()),
+            float(bridge_oracle_Vpi[0].max()),
+            1e-3,
+        )
+        _row_label = f"V^π(s, t={_t})  under truth"
+        _t_stale_v = f"Stale  V^π(s, t={_t})"
+        _t_myopic_v = f"Myopic replan  V^π(s, t={_t})"
+        _t_oracle_v = f"Oracle  V^π(s, t={_t})"
+    elif _mode.startswith("Action gap"):
+        _gap = bridge_oracle_gap[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
+        _grid_stale = _gap
+        _grid_myopic = _gap
+        _grid_oracle = _gap
+        _vmax = max(float(bridge_oracle_gap.max()), 1e-3)
+        _row_label = f"Action gap (oracle Q*) at t={_t}"
+        _t_stale_v = f"Stale  arrows on gap (t={_t})"
+        _t_myopic_v = f"Myopic  arrows on gap (t={_t})"
+        _t_oracle_v = f"Oracle  arrows on gap (t={_t})"
+    else:
+        _grid_stale = bridge_stationary_V.reshape(BRIDGE_NROW, BRIDGE_NCOL)
+        _grid_myopic = bridge_myopic_V[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
+        _grid_oracle = bridge_oracle_V[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
+        _vmax = max(
+            float(bridge_stationary_V.max()),
+            float(bridge_oracle_V[0].max()),
+            float(bridge_myopic_V[0].max()),
+            1e-3,
+        )
+        _row_label = "V*(s,t)  (different horizons — NOT comparable)"
+        _t_stale_v = "Stale VI   (no updates)"
+        _t_myopic_v = f"Myopic replan   V(s, t={_t})"
+        _t_oracle_v = f"Oracle VI   V(s, t={_t})"
 
     _fig, _axes = plt.subplots(
         2, 3, figsize=(16, 7),
         gridspec_kw={"height_ratios": [BRIDGE_NROW, BRIDGE_NROW]},
         layout="constrained",
     )
-    # Top row — V(s, t)
+    # Top row — heatmap (with arrows). Arrows always show planner's policy.
     bridge_draw_value_panel(
         _axes[0, 0],
-        bridge_stationary_V.reshape(BRIDGE_NROW, BRIDGE_NCOL),
+        _grid_stale,
         bridge_stationary_policy.reshape(BRIDGE_NROW, BRIDGE_NCOL),
-        "Stale VI   (no updates)",
+        _t_stale_v,
         vmax=_vmax,
     )
     bridge_draw_value_panel(
         _axes[0, 1],
-        bridge_myopic_V[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL),
+        _grid_myopic,
         bridge_myopic_policy[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL),
-        f"Myopic replan   V(s, t={_t})",
+        _t_myopic_v,
         vmax=_vmax,
     )
     _im_v = bridge_draw_value_panel(
         _axes[0, 2],
-        bridge_oracle_V[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL),
+        _grid_oracle,
         bridge_oracle_policy[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL),
-        f"Oracle VI   V(s, t={_t})",
+        _t_oracle_v,
         vmax=_vmax,
     )
     # Bottom row — π(s, t)
@@ -2509,7 +2794,7 @@ def _(
     _short_drift = fl_drift_pick.value.split(" — ")[0].split("(")[0].strip()
     _fig.suptitle(
         f"BRIDGE  •  {_short_sched}  ×  {_short_drift}  •  "
-        f"top: V(s,t)   bottom: π(s,t)",
+        f"top: {_row_label}   bottom: π(s,t)",
         fontsize=10,
     )
     _fig.colorbar(_im_v, ax=_axes[0, :], fraction=0.025, pad=0.02)
@@ -2898,11 +3183,13 @@ def _(np):
 
 
 @app.cell
-def _(gym, value_iteration):
+def _(fl_oracle_gamma, gym, value_iteration):
     fl_stationary_env = gym.make(
         "FrozenLake-v1", is_slippery=False, max_episode_steps=50
     )
-    fl_stationary_policy, fl_stationary_V = value_iteration(fl_stationary_env)
+    fl_stationary_policy, fl_stationary_V = value_iteration(
+        fl_stationary_env, gamma=fl_oracle_gamma,
+    )
     return fl_stationary_V, fl_stationary_policy
 
 
@@ -3101,9 +3388,15 @@ def _(
     np,
     save_sweep,
 ):
+    import time as _time
     fl_vi_sweep = None
     fl_vi_sweep_path = None
-    if fl_vi_run_sweep.value:
+    if not fl_vi_run_sweep.value:
+        _status = mo.md(
+            "_Click **Run stale-VI sweep** above (~10 s)._"
+        )
+    else:
+        _t0 = _time.time()
         _ks = np.linspace(0.0, 0.3, 7)
         _returns_by_k = {}
         for _k in mo.status.progress_bar(
@@ -3126,7 +3419,11 @@ def _(
             "returns_by_k": _returns_by_k,
         }
         fl_vi_sweep_path = save_sweep("nb_2_frozenlake_vi.json", fl_vi_sweep)
-    _ = (fl_vi_sweep, fl_vi_sweep_path)
+        _status = mo.md(
+            f"✓ Stale-VI sweep finished in **{_time.time() - _t0:.1f} s** — "
+            f"7 drift levels × 30 episodes. Saved to `{fl_vi_sweep_path}`."
+        )
+    _status
     return (fl_vi_sweep,)
 
 
@@ -3629,8 +3926,15 @@ def _(
     np,
     ns_oracle_vi,
 ):
+    import time as _time
     eval_runs_inline = {}
-    if fl_eval_resweep.value:
+    if not fl_eval_resweep.value:
+        _eval_status = mo.md(
+            "_Click the button above to run any missing sweeps inline "
+            "(~10–30 s depending on what's missing)._"
+        )
+    else:
+        _t0 = _time.time()
         _missing_label_to_key = {
             "random (Section 1)": "random",
             "stale-VI (Section 2)": "stale-VI",
@@ -3684,6 +3988,11 @@ def _(
                         _returns.append(float(_ret))
                 _runs_by_k[float(_k)] = _returns
             eval_runs_inline[_key] = _runs_by_k
+        _eval_status = mo.md(
+            f"✓ Inline sweeps finished in **{_time.time() - _t0:.1f} s** — "
+            f"ran {', '.join(_todo)} ({_N_EP} eps × 7 drift levels each)."
+        )
+    _eval_status
     return (eval_runs_inline,)
 
 
@@ -3882,6 +4191,224 @@ def _(mo):
             "</div>"
         ),
     ], align="center", gap=0)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #1a1a1a; background: #efefef;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Try it — same MCTS, three notification levels</div></div>
+
+    Same env, same drift, same MCTS — only the **notification level**
+    changes. The agent's only difference is *what
+    `get_planning_env()` hands it*: the **initial** snapshot (no delta
+    info, levels 1–2) or the **live** snapshot at the current `t`
+    (delta info, level 3).
+
+    We average over 8 seeds with a moderate MCTS budget
+    (`d=20, m=80`); expect ~30 s of compute.
+
+    ### The MCTS interaction loop
+
+    The planner is just MCTS from `ns_gym.benchmark_algorithms`,
+    rebuilt every step from `env.get_planning_env()`:
+
+    ```python
+    from ns_gym.benchmark_algorithms import MCTS
+
+    obs, _ = env.reset(seed=0)
+    state = obs["state"]                       # NS-Gym dict obs
+    done = trunc = False
+    while not (done or trunc):
+        # The planning env's P table reflects the notification level:
+        #   none / change_notification -> initial-snapshot P
+        #   delta_change_notification  -> current-snapshot P
+        penv = env.get_planning_env()
+        agent = MCTS(penv, state=state, d=20, m=80, c=1.4, gamma=0.95)
+        action, _ = agent.search()
+        obs, reward, done, trunc, _ = env.step(int(action))
+        state = obs["state"]
+    ```
+
+    > **What you should look at first:** the **right panel** —
+    > what the planner *thinks* the slip distribution is. With
+    > `none` / `change_notification`, the planner is stuck on
+    > $\theta_0$ forever; with `delta_change_notification` it
+    > tracks the live $\theta_t$ (drift visible from step 1).
+    > The right panel is the educational core.
+    >
+    > **The left panel is more subtle.** On 4×4 FrozenLake the
+    > optimal path is *forced* (any path crowds holes), so
+    > planning against the live slippery model doesn't unlock
+    > a safer route — it just adds rollout variance to MCTS
+    > Q-estimates, which can hurt small-budget search. The
+    > deterministic-snapshot planners (`none` / `change`)
+    > sometimes ride the optimal-on-deterministic plan to a
+    > goal that the slip-aware planner second-guesses itself
+    > out of. **Notification level changes what the planner
+    > perceives; whether that perception helps depends on the
+    > env.** On a denser-reward / less-pinned env you'd
+    > expect the ranking to flip.
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    fl_notif_run = mo.ui.run_button(
+        label="▶ Roll MCTS at 3 notification levels (8 seeds × 3 levels)"
+    )
+    fl_notif_run
+    return (fl_notif_run,)
+
+
+@app.cell
+def _(
+    ContinuousScheduler,
+    DistributionDecrementUpdate,
+    NSFrozenLakeWrapper,
+    fl_init_intended,
+    fl_notif_run,
+    gym,
+    mo,
+    np,
+    plt,
+    type_mismatch_checker,
+):
+    import time as _time
+    if not fl_notif_run.value:
+        _out = mo.md(
+            "_Click the run button to launch the comparison "
+            "(~30 s)._"
+        )
+    else:
+        _t0 = _time.time()
+        from ns_gym.benchmark_algorithms import MCTS as _MCTS
+
+        def _make_env(change_notif, delta_notif):
+            base = gym.make(
+                "FrozenLake-v1", is_slippery=False,
+                max_episode_steps=50,
+            )
+            sched = ContinuousScheduler()
+            update_fn = DistributionDecrementUpdate(
+                scheduler=sched, k=0.06,
+            )
+            return NSFrozenLakeWrapper(
+                base, {"P": update_fn},
+                change_notification=change_notif,
+                delta_change_notification=delta_notif,
+                initial_prob_dist=init_dist(fl_init_intended.value),
+            )
+
+        _levels = [
+            ("none",                       False, False, "tab:red"),
+            ("change_notification",        True,  False, "tab:orange"),
+            ("delta_change_notification",  True,  True,  "tab:green"),
+        ]
+        _MAX = 30
+        _N_SEEDS = 8
+        _MCTS_KW = dict(d=20, m=80, c=1.4, gamma=0.95)
+        _by_level = {}
+        # One progress tick per (level, seed) episode = 24 total.
+        _episodes = [
+            (_lbl, _cn, _dn, _col, _seed)
+            for (_lbl, _cn, _dn, _col) in _levels
+            for _seed in range(_N_SEEDS)
+        ]
+        for _lbl, _cn, _dn, _col, _seed in mo.status.progress_bar(
+            _episodes,
+            title="MCTS — three notification levels",
+            subtitle="rolling out one episode per (level, seed)…",
+            remove_on_exit=True,
+        ):
+            np.random.seed(_seed)
+            _env = _make_env(_cn, _dn)
+            _obs, _ = _env.reset(seed=_seed)
+            _state, _ = type_mismatch_checker(_obs)
+            _cur = 0.0
+            _done = _trunc = False
+            _t = 0
+            _per = []
+            while not (_done or _trunc) and _t < _MAX:
+                _penv = _env.get_planning_env()
+                _per.append(float(_penv.transition_prob[0]))
+                _agent = _MCTS(
+                    _penv, state=int(_state), **_MCTS_KW,
+                )
+                _a, _ = _agent.search()
+                _obs, _r, _done, _trunc, _ = _env.step(int(_a))
+                _state, _r = type_mismatch_checker(_obs, _r)
+                _cur += float(_r)
+                _t += 1
+            _bucket = _by_level.setdefault(
+                _lbl, {"returns": [], "perceived": None, "color": _col},
+            )
+            _bucket["returns"].append(_cur)
+            if _bucket["perceived"] is None:
+                while len(_per) < _MAX:
+                    _per.append(_per[-1] if _per else 1.0)
+                _bucket["perceived"] = _per
+
+        _fig, (_ax_r, _ax_p) = plt.subplots(
+            1, 2, figsize=(11.5, 3.6), layout="constrained",
+        )
+        # Left: bar chart of mean return ± std across seeds
+        _names = list(_by_level.keys())
+        _means = [np.mean(_by_level[k]["returns"]) for k in _names]
+        _stds = [np.std(_by_level[k]["returns"]) for k in _names]
+        _succs = [
+            sum(1 for r in _by_level[k]["returns"] if r > 0)
+            for k in _names
+        ]
+        _colors = [_by_level[k]["color"] for k in _names]
+        _xs = np.arange(len(_names))
+        _ax_r.bar(_xs, _means, yerr=_stds, color=_colors, capsize=4,
+                  edgecolor="black", linewidth=0.5)
+        for _i, (_m, _succ) in enumerate(zip(_means, _succs)):
+            _ax_r.text(
+                _xs[_i], _m + 0.04,
+                f"μ={_m:.2f}\n{_succ}/{_N_SEEDS} succ",
+                ha="center", va="bottom", fontsize=8,
+            )
+        _ax_r.set_xticks(_xs)
+        _ax_r.set_xticklabels(
+            ["none", "change", "delta"], fontsize=9,
+        )
+        _ax_r.set_ylabel("mean episode return")
+        _ax_r.set_ylim(0, 1.2)
+        _ax_r.set_title(
+            f"MCTS return  (mean ± std over {_N_SEEDS} seeds)",
+            fontsize=10,
+        )
+        # Right: planner-perception trace from seed 0 (representative)
+        for _k, _info in _by_level.items():
+            _ax_p.plot(
+                _info["perceived"], label=_k, color=_info["color"],
+                linewidth=1.8, marker="o", markersize=3,
+            )
+        _ax_p.set_xlabel("step")
+        _ax_p.set_ylabel(r"$P[\text{intended}]$ in the planning env")
+        _ax_p.set_title(
+            "What slip prob does the planner think it's facing?  "
+            "(seed 0)",
+            fontsize=10,
+        )
+        _ax_p.set_ylim(-0.05, 1.05)
+        _ax_p.legend(fontsize=7, loc="lower left")
+        _elapsed = _time.time() - _t0
+        _summary = "  ·  ".join(
+            f"{k.split('_')[0]}: μ={np.mean(_by_level[k]['returns']):.2f}"
+            for k in _by_level
+        )
+        _out = mo.vstack([
+            _fig,
+            mo.md(
+                f"✓ Finished in **{_elapsed:.1f} s** "
+                f"({len(_episodes)} episodes total).  {_summary}"
+            ),
+        ])
+    _out
     return
 
 
@@ -4208,9 +4735,15 @@ def _(
     np,
     save_sweep,
 ):
+    import time as _time
     fl_replan_sweep = None
     fl_replan_sweep_path = None
-    if fl_replan_run_sweep.value:
+    if not fl_replan_run_sweep.value:
+        _status = mo.md(
+            "_Click **Run stale vs re-plan sweep** above (~30 s)._"
+        )
+    else:
+        _t0 = _time.time()
         _ks = np.linspace(0.0, 0.3, 7)
         _stale_by_k = {}
         _replan_by_k = {}
@@ -4244,7 +4777,12 @@ def _(
         fl_replan_sweep_path = save_sweep(
             "nb_3_frozenlake_replan.json", fl_replan_sweep,
         )
-    _ = (fl_replan_sweep, fl_replan_sweep_path)
+        _status = mo.md(
+            f"✓ Stale-vs-replan sweep finished in **{_time.time() - _t0:.1f} s** "
+            f"— 7 drift levels × 30 episodes × 2 planners. "
+            f"Saved to `{fl_replan_sweep_path}`."
+        )
+    _status
     return (fl_replan_sweep,)
 
 
@@ -4319,29 +4857,28 @@ def _(np):
     def build_ns_tensors(make_env_fn, T, seed=0):
         """Snapshot the wrapped env's transition table at each of T timesteps.
 
-        Uses a fresh env per timestep and steps it forward `t` times before
-        snapshotting `env.unwrapped.P`. O(T^2) but T is small. Robust to
-        episode termination — we step with action 0 and ignore done/trunc.
+        The wrapper applies ``update_fn(prob, self.t)`` BEFORE each real
+        transition, so the table that governs the agent's t-th step is
+        the one *after* update_fn has fired with argument t. We replay
+        update_fn(prob, 0), update_fn(prob, 1), ... in-place on a single
+        env (no real stepping — avoids agent-state side effects and
+        episode truncation) and snapshot after each call.
         """
-        _probe = make_env_fn()
-        _probe.reset(seed=seed)
-        n_states = _probe.unwrapped.observation_space.n
-        n_actions = _probe.unwrapped.action_space.n
+        env = make_env_fn()
+        env.reset(seed=seed)
+        n_states = env.unwrapped.observation_space.n
+        n_actions = env.unwrapped.action_space.n
 
         P = np.zeros((T, n_states, n_actions, n_states), dtype=np.float64)
         R = np.zeros((T, n_states, n_actions, n_states), dtype=np.float64)
 
         for t in range(T):
-            env = make_env_fn()
-            env.reset(seed=seed)
-            for _ in range(t):
-                try:
-                    env.step(0)
-                except Exception:
-                    break
+            env.transition_prob, fired, _ = env.update_fn(env.transition_prob, t)
+            if fired:
+                env._update_transition_prob_table()
             for s in range(n_states):
                 for a in range(n_actions):
-                    for prob, sp, reward, _ in env.unwrapped.P[s][a]:
+                    for prob, sp, reward, _ in env.P[s][a]:
                         P[t, s, a, sp] += float(prob)
                         R[t, s, a, sp] = float(reward)
         return P, R
@@ -4455,6 +4992,95 @@ def _(np):
         return V, policy
 
     return (stationary_vi_jit,)
+
+
+@app.cell
+def _(np):
+    from numba import njit as _njit_pe
+
+    @_njit_pe
+    def policy_eval_ns_jit(P, R, gamma, policy):
+        """Backward-pass policy evaluation under the true non-stationary tensor.
+
+        V^π(s, t) = expected return from (s, t) when actions are chosen
+        by ``policy`` and dynamics are governed by the time-indexed
+        ``P``/``R``. No max — we plug in the policy's action and propagate.
+        Used for apples-to-apples comparison: each planner's policy is
+        evaluated under the *same* (true) dynamics, so panel-to-panel
+        differences reflect policy quality alone, not horizon assumptions.
+
+        Args:
+            P: (T, S, A, S) — true non-stationary transition tensor.
+            R: (T, S, A, S) — true non-stationary reward tensor.
+            gamma: discount factor.
+            policy: (T, S) int array — action per (time, state). For a
+                stale (time-invariant) policy, tile (S,) → (T, S) before
+                calling.
+
+        Returns:
+            V: (T+1, S) — V[T] = 0; V[t, s] = E[return from (s, t)].
+        """
+        T = P.shape[0]
+        S = P.shape[1]
+        V = np.zeros((T + 1, S))
+        for t in range(T - 1, -1, -1):
+            for s in range(S):
+                a = policy[t, s]
+                v = 0.0
+                for sp in range(S):
+                    p = P[t, s, a, sp]
+                    if p > 0.0:
+                        v += p * (R[t, s, a, sp] + gamma * V[t + 1, sp])
+                V[t, s] = v
+        return V
+
+    @_njit_pe
+    def oracle_q_gap_jit(P, R, gamma):
+        """Oracle Q-values and action gap (max Q* − second-best Q*) per (s, t).
+
+        The action gap measures how *decisive* the optimal choice is. Big
+        gap → picking the wrong action costs a lot; small gap → multiple
+        actions are roughly tied and the policy disagreement is cheap.
+        Invariant to horizon scaling, unlike V*.
+
+        Returns:
+            Q: (T, S, A) — Q*(s, a, t) under oracle backward induction.
+            gap: (T, S) — max_a Q* − second_max_a Q* at each (s, t).
+        """
+        T = P.shape[0]
+        S = P.shape[1]
+        A = P.shape[2]
+        V = np.zeros((T + 1, S))
+        Q = np.zeros((T, S, A))
+        for t in range(T - 1, -1, -1):
+            for s in range(S):
+                best_q = -1e18
+                for a in range(A):
+                    q = 0.0
+                    for sp in range(S):
+                        p = P[t, s, a, sp]
+                        if p > 0.0:
+                            q += p * (R[t, s, a, sp] + gamma * V[t + 1, sp])
+                    Q[t, s, a] = q
+                    if q > best_q:
+                        best_q = q
+                V[t, s] = best_q
+        gap = np.zeros((T, S))
+        for t in range(T):
+            for s in range(S):
+                best = -1e18
+                second = -1e18
+                for a in range(A):
+                    q = Q[t, s, a]
+                    if q > best:
+                        second = best
+                        best = q
+                    elif q > second:
+                        second = q
+                gap[t, s] = best - second
+        return Q, gap
+
+    return oracle_q_gap_jit, policy_eval_ns_jit
 
 
 @app.cell
@@ -4977,8 +5603,14 @@ def _(
     )
 
     def _avg_q_gap(picker, n_seeds, T_max):
+        """Returns (mean_gap_per_step, count_per_step, per_seed_cum_gap).
+
+        per_seed_cum_gap is a length-n_seeds array of total cumulative
+        Q-gap per episode -- the right granularity for a violin plot.
+        """
         sum_gap = np.zeros(T_max)
         count = np.zeros(T_max)
+        per_seed_cum = np.zeros(n_seeds, dtype=np.float64)
         for s in range(n_seeds):
             m = fl_rollout_with_metrics(
                 fl_make_env(fl_adapt_k.value), picker, seed=s,
@@ -4987,24 +5619,23 @@ def _(
                 if t < T_max:
                     sum_gap[t] += g
                     count[t] += 1
-        return sum_gap / np.maximum(count, 1), count
+                per_seed_cum[s] += g
+        return sum_gap / np.maximum(count, 1), count, per_seed_cum
 
     fl_diag_n_seeds = 20
     fl_diag_T_max = fl_oracle_P.shape[0]
-    fl_diag_stale_avg, fl_diag_stale_count = _avg_q_gap(
-        _stale_picker, fl_diag_n_seeds, fl_diag_T_max,
-    )
-    fl_diag_oracle_avg, fl_diag_oracle_count = _avg_q_gap(
-        _oracle_picker, fl_diag_n_seeds, fl_diag_T_max,
-    )
+    (
+        fl_diag_stale_avg, fl_diag_stale_count, fl_diag_stale_per_seed,
+    ) = _avg_q_gap(_stale_picker, fl_diag_n_seeds, fl_diag_T_max)
+    (
+        fl_diag_oracle_avg, fl_diag_oracle_count, fl_diag_oracle_per_seed,
+    ) = _avg_q_gap(_oracle_picker, fl_diag_n_seeds, fl_diag_T_max)
     return (
         fl_diag_n_seeds,
         fl_diag_oracle,
-        fl_diag_oracle_avg,
-        fl_diag_oracle_count,
+        fl_diag_oracle_per_seed,
         fl_diag_stale,
-        fl_diag_stale_avg,
-        fl_diag_stale_count,
+        fl_diag_stale_per_seed,
     )
 
 
@@ -5012,15 +5643,19 @@ def _(
 def _(
     fl_diag_n_seeds,
     fl_diag_oracle,
-    fl_diag_oracle_avg,
-    fl_diag_oracle_count,
+    fl_diag_oracle_per_seed,
     fl_diag_stale,
-    fl_diag_stale_avg,
-    fl_diag_stale_count,
+    fl_diag_stale_per_seed,
     np,
     plt,
 ):
-    _fig, _axes = plt.subplots(3, 1, figsize=(10, 7.6), sharex=True)
+    # Top + middle panels share the per-step x-axis; the bottom violin
+    # is its own thing.
+    _fig = plt.figure(figsize=(10, 8.6), constrained_layout=True)
+    _gs = _fig.add_gridspec(3, 1, height_ratios=[1.0, 1.0, 1.1])
+    _axes = [_fig.add_subplot(_gs[0]), _fig.add_subplot(_gs[1])]
+    _axes.append(_fig.add_subplot(_gs[2]))
+    _axes[0].sharex(_axes[1])
 
     # Top: P[intended] over the rollout (single sample)
     for label, m, color in [
@@ -5064,27 +5699,46 @@ def _(
     )
     _axes[1].legend(fontsize=8, loc="upper right")
 
-    # Bottom: average Q-gap per step across seeds
-    for label, avg, count, color in [
-        ("stale-VI avg gap", fl_diag_stale_avg, fl_diag_stale_count, "tab:red"),
-        ("oracle avg gap", fl_diag_oracle_avg, fl_diag_oracle_count, "tab:green"),
-    ]:
-        _mask = count > 0
-        _xs = np.arange(len(avg))[_mask]
-        _ys = avg[_mask]
-        _axes[2].plot(_xs, _ys, label=label, color=color,
-                      linewidth=1.6, marker="o", markersize=3)
+    # Bottom: per-seed CUMULATIVE Q-gap distribution (violin + strip).
+    # Replaces the prior "mean Q-gap per step" line plot, which hid the
+    # per-seed spread and -- for monotone-non-decreasing cumulative Q-gap
+    # -- mostly just showed the slope. Each dot here is one episode's
+    # *total* regret vs. the oracle.
+    _per_seed = [
+        ("stale-VI", fl_diag_stale_per_seed,  "tab:red"),
+        ("oracle",   fl_diag_oracle_per_seed, "tab:green"),
+    ]
+    _names = [n for n, _, _ in _per_seed]
+    _data  = [d for _, d, _ in _per_seed]
+    _cols  = [c for _, _, c in _per_seed]
+    _positions = list(range(len(_names)))
+    _vp = _axes[2].violinplot(
+        _data, positions=_positions, showmeans=False,
+        showmedians=False, showextrema=False, widths=0.7,
+    )
+    for _body, _c in zip(_vp["bodies"], _cols):
+        _body.set_facecolor(_c); _body.set_edgecolor("black")
+        _body.set_alpha(0.45); _body.set_linewidth(0.6)
+    _rng = np.random.default_rng(0)
+    for _i, (_n, _d, _c) in enumerate(_per_seed):
+        _xs = _i + _rng.uniform(-0.12, 0.12, size=len(_d))
+        _axes[2].scatter(_xs, _d, s=28, alpha=0.75, color=_c,
+                         edgecolor="black", linewidth=0.4, zorder=4)
+        _mu = float(np.mean(_d))
+        _se = float(np.std(_d, ddof=1) / np.sqrt(len(_d))) if len(_d) > 1 else 0.0
+        _axes[2].errorbar(_i, _mu, yerr=_se, fmt="D", color="white",
+                          markerfacecolor="black", markeredgecolor="black",
+                          markersize=7, capsize=5, zorder=5)
     _axes[2].axhline(0, color="grey", linewidth=0.6)
-    _axes[2].set_ylabel(r"mean $\Delta_Q$ per step")
-    _axes[2].set_xlabel("step")
+    _axes[2].set_xticks(_positions)
+    _axes[2].set_xticklabels(_names, fontsize=9)
+    _axes[2].set_ylabel(r"per-episode total $\sum_t \Delta_Q$ (lower is better)")
     _axes[2].set_title(
-        f"Average Q-gap across {fl_diag_n_seeds} seeds "
-        "(only steps where ≥1 episode reached are shown)",
+        f"Per-seed cumulative Q-gap across {fl_diag_n_seeds} seeds "
+        "— oracle is the floor",
         fontsize=10,
     )
-    _axes[2].legend(fontsize=8, loc="upper right")
 
-    _fig.tight_layout()
     _fig
     return
 
@@ -5118,9 +5772,16 @@ def _(
     ns_oracle_vi,
     save_sweep,
 ):
+    import time as _time
     fl_oracle_sweep = None
     fl_oracle_sweep_path = None
-    if fl_oracle_run_sweep.value:
+    if not fl_oracle_run_sweep.value:
+        _status = mo.md(
+            "_Click **Run oracle sweep** above (~15 s — builds time-"
+            "augmented (P, R) tensors and rolls out)._"
+        )
+    else:
+        _t0 = _time.time()
         _ks = np.linspace(0.0, 0.3, 7)
         _returns_by_k = {}
         for _k in mo.status.progress_bar(
@@ -5152,7 +5813,12 @@ def _(
         fl_oracle_sweep_path = save_sweep(
             "nb_3_frozenlake_oracle.json", fl_oracle_sweep,
         )
-    _ = (fl_oracle_sweep, fl_oracle_sweep_path)
+        _status = mo.md(
+            f"✓ Oracle sweep finished in **{_time.time() - _t0:.1f} s** — "
+            f"7 drift levels × 30 episodes (oracle backward-induction). "
+            f"Saved to `{fl_oracle_sweep_path}`."
+        )
+    _status
     return (fl_oracle_sweep,)
 
 
@@ -5225,7 +5891,9 @@ def _(mo):
         SB3_DQN_PATH = "model_weights/contextual_ddqn_frozenlake.zip"
 
         # Rollout budget (small = fast, larger = smoother curves).
-        N_SEEDS   = 3
+        # 20 seeds gives stable means without making each scenario take
+        # forever; drop to 5-10 if you're iterating on the env itself.
+        N_SEEDS   = 20
         MAX_STEPS = 50
         ''')
     fl_planners_kwargs = mo.ui.code_editor(
@@ -5264,12 +5932,14 @@ def _(
     plt,
     type_mismatch_checker,
 ):
+    import time as _time
     if not fl_planners_run.value:
         _out = mo.md(
             "_Choose an env, edit kwargs above if you want, then click run. "
-            "~30s on a laptop._"
+            "~30 s on a laptop._"
         )
     else:
+        _t0 = _time.time()
         from ns_gym.benchmark_algorithms import MCTS as _MCTS
         try:
             from ns_gym.benchmark_algorithms import RATS as _RATS
@@ -5284,7 +5954,7 @@ def _(
             "PAMCTS_ALPHA": 0.5,
             "PAMCTS_MCTS_KWARGS": dict(d=20, m=20, c=1.4, gamma=0.95),
             "SB3_DQN_PATH": "model_weights/contextual_ddqn_frozenlake.zip",
-            "N_SEEDS": 3,
+            "N_SEEDS": 20,
             "MAX_STEPS": 50,
         }
         _kw_err = None
@@ -5358,8 +6028,30 @@ def _(
         def _make_rats_picker():
             if _RATS is None:
                 return None
+            # Inject a private hole=-1 view of the planning env so RATS'
+            # depth-2 worst-case minimax has a usable gradient. Without
+            # this, every leaf returns 0 reward (goal too far) and RATS
+            # picks arbitrary actions across all contexts -- same fix
+            # used in scenarios B and C.
+            def _inject_hole_penalty(penv):
+                P = penv.unwrapped.P
+                if not isinstance(P, dict):
+                    return penv  # Bridge envs use a different P shape
+                new_P = {
+                    s: {
+                        a: [
+                            (p, ns, -1.0 if (d and r <= 0) else float(r), d)
+                            for p, ns, r, d in P[s][a]
+                        ] for a in P[s]
+                    } for s in P
+                }
+                penv.P = new_P
+                penv.unwrapped.P = new_P
+                if hasattr(penv, "intial_p"):
+                    penv.intial_p = new_P
+                return penv
             def _pick(state, _t, env):
-                penv = env.get_planning_env()
+                penv = _inject_hole_penalty(env.get_planning_env())
                 agent = _RATS(
                     action_space=penv.action_space, **_kw["RATS_KWARGS"],
                 )
@@ -5407,7 +6099,15 @@ def _(
                 return int(np.argmax(hybrid))
             return _pick
 
+        T_ORACLE = _V_t.shape[0] - 1
+
+        # Oracle VI = ceiling baseline. Argmax over the time-indexed
+        # oracle Q tensor; effectively free per decision.
+        def _pick_oracle(state, t, _env):
+            return int(np.argmax(_oracle_q(min(t, T_ORACLE - 1), int(state))))
+
         _planners = {
+            "Oracle VI":  _pick_oracle,
             "stale-VI":   _pick_stale,
             "MCTS":       _pick_mcts,
             "PA-MCTS":    _make_pamcts_picker(),
@@ -5415,14 +6115,13 @@ def _(
             "DQN (SB3)":  _make_dqn_picker(),
         }
 
-        T_ORACLE = _V_t.shape[0] - 1
         MAX_STEPS = int(_kw["MAX_STEPS"])
         SEEDS = list(range(int(_kw["N_SEEDS"])))
 
         def _rollout(picker):
-            cum_r_acc = np.zeros(MAX_STEPS, dtype=np.float64)
-            cum_q_acc = np.zeros(MAX_STEPS, dtype=np.float64)
-            n_acc = np.zeros(MAX_STEPS, dtype=np.int32)
+            """Returns (final_returns, final_qgaps) -- one entry per seed."""
+            final_returns = []
+            final_qgaps = []
             for s in SEEDS:
                 env = _make_env()
                 obs, _ = env.reset(seed=s)
@@ -5440,24 +6139,22 @@ def _(
                     obs, reward, done, trunc, _ = env.step(a_taken)
                     state, reward = type_mismatch_checker(obs, reward)
                     cum_r += float(reward)
-                    cum_r_acc[t] += cum_r
-                    cum_q_acc[t] += cum_q
-                    n_acc[t] += 1
                     t += 1
-                while t < MAX_STEPS:
-                    cum_r_acc[t] += cum_r
-                    cum_q_acc[t] += cum_q
-                    n_acc[t] += 1
-                    t += 1
-            mean_r = cum_r_acc / np.maximum(n_acc, 1)
-            mean_q = cum_q_acc / np.maximum(n_acc, 1)
-            return mean_r, mean_q
+                final_returns.append(cum_r)
+                final_qgaps.append(cum_q)
+            return np.asarray(final_returns), np.asarray(final_qgaps)
 
         _traces = {}
         _errors = {}
         if _kw_err:
             _errors["⚙️ kwargs"] = _kw_err
-        for _name, _pick in _planners.items():
+        _planner_items = list(_planners.items())
+        for _name, _pick in mo.status.progress_bar(
+            _planner_items,
+            title="Planner comparison",
+            subtitle="rolling out each planner across seeds…",
+            remove_on_exit=True,
+        ):
             if _pick is None:
                 if _is_bridge and _name in ("DQN (SB3)", "PA-MCTS"):
                     _errors[_name] = (
@@ -5472,55 +6169,130 @@ def _(
                 _errors[_name] = f"{type(_e).__name__}: {_e}"
 
         _colors = {
+            "Oracle VI":  "#1a1a1a",
             "stale-VI":   "tab:red",
             "MCTS":       "tab:blue",
             "PA-MCTS":    "tab:orange",
             "RATS":       "tab:purple",
             "DQN (SB3)":  "tab:green",
         }
-        _fig, (_ax_r, _ax_q) = plt.subplots(
-            1, 2, figsize=(11, 3.6), layout="constrained",
-        )
-        for _name, (_mr, _mq) in _traces.items():
-            _ax_r.plot(_mr, label=_name, color=_colors[_name],
-                       linewidth=1.8, marker="o", markersize=3)
-            _ax_q.plot(_mq, label=_name, color=_colors[_name],
-                       linewidth=1.8, marker="o", markersize=3)
+        # Two side-by-side violins: per-seed final returns (left) and
+        # per-seed final Q-gaps (right). The line plots used to live here
+        # but a) cumulative reward on terminal-only-reward envs is mostly
+        # flat with one late jump, and b) cumulative Q-gap is monotone
+        # non-decreasing -- the *final* number per seed carries the
+        # comparison, and the violin shows the spread the line plot hid.
         _env_label = "Bridge" if _is_bridge else "FrozenLake"
-        _ax_r.set_xlabel("step")
-        _ax_r.set_ylabel("cumulative reward (mean over seeds)")
-        _ax_r.set_title(
-            f"Cumulative reward  •  {_env_label}  •  k={fl_adapt_k.value:.2f}",
-            fontsize=10,
+        _fig, (_ax_r, _ax_q) = plt.subplots(
+            1, 2, figsize=(13, 4.6), layout="constrained",
         )
-        if _is_bridge:
-            _ax_r.set_ylim(-1.1, 1.1)
-        else:
-            _ax_r.set_ylim(-0.05, 1.05)
+        _names = list(_traces.keys())
+        _positions = list(range(len(_names)))
+        _rng = np.random.default_rng(0)
+        _stagger_y_r = (1.10, 1.28)
+
+        # ---- final-return violin (LEFT) ----
+        _ret_data = [_traces[n][0] for n in _names]
+        if _ret_data:
+            _vp = _ax_r.violinplot(
+                _ret_data, positions=_positions, showmeans=False,
+                showmedians=False, showextrema=False, widths=0.75,
+            )
+            for _body, _n in zip(_vp["bodies"], _names):
+                _body.set_facecolor(_colors.get(_n, "gray"))
+                _body.set_edgecolor("black")
+                _body.set_alpha(0.45)
+                _body.set_linewidth(0.6)
+        for _i, _n in enumerate(_names):
+            _arr = _traces[_n][0]
+            if len(_arr) == 0:
+                continue
+            _xs = _i + _rng.uniform(-0.12, 0.12, size=len(_arr))
+            _ax_r.scatter(_xs, _arr, s=28, alpha=0.75,
+                          color=_colors.get(_n, "gray"),
+                          edgecolor="black", linewidth=0.4, zorder=4)
+            _mu = float(np.mean(_arr))
+            _se = float(np.std(_arr, ddof=1) / np.sqrt(len(_arr))) if len(_arr) > 1 else 0.0
+            _ax_r.errorbar(_i, _mu, yerr=_se, fmt="D", color="white",
+                           markerfacecolor="black", markeredgecolor="black",
+                           markersize=7, capsize=5, zorder=5)
+            _wins = int(np.sum(_arr > 0))
+            _y_text = _stagger_y_r[_i % 2]
+            _ax_r.text(_i, _y_text,
+                       f"μ={_mu:.2f}±{_se:.02f}\n{_wins}/{len(_arr)} goals",
+                       ha="center", va="bottom", fontsize=8)
         _ax_r.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
-        _ax_r.legend(fontsize=8, loc="lower right")
-        _ax_q.set_xlabel("step")
-        _ax_q.set_ylabel(r"cumulative $\Delta_Q$ (regret vs. oracle)")
-        _ax_q.set_title(
-            f"Cumulative Q-gap  •  {_env_label}  •  lower is better",
+        _ax_r.axhline(1, color="grey", linewidth=0.5, alpha=0.4)
+        _ax_r.set_xticks(_positions)
+        _ax_r.set_xticklabels(_names, fontsize=8, rotation=30, ha="right")
+        _ax_r.set_ylabel("return per seed (1 = goal reached)")
+        _ax_r.set_ylim(-0.15 if not _is_bridge else -1.15, 1.65)
+        _ax_r.set_title(
+            f"Per-seed return  •  {_env_label}  •  k={fl_adapt_k.value:.2f}",
             fontsize=10,
         )
+
+        # ---- final-Q-gap violin (RIGHT) ----
+        _gap_data = [_traces[n][1] for n in _names]
+        if _gap_data:
+            _vp_q = _ax_q.violinplot(
+                _gap_data, positions=_positions, showmeans=False,
+                showmedians=False, showextrema=False, widths=0.75,
+            )
+            for _body, _n in zip(_vp_q["bodies"], _names):
+                _body.set_facecolor(_colors.get(_n, "gray"))
+                _body.set_edgecolor("black")
+                _body.set_alpha(0.45)
+                _body.set_linewidth(0.6)
+        # y-range for staggered annotations: depends on the data, so
+        # compute after the data is drawn
+        _gap_max = float(max((np.max(g) for g in _gap_data if len(g) > 0), default=1.0))
+        _gap_min = float(min((np.min(g) for g in _gap_data if len(g) > 0), default=0.0))
+        _gap_span = max(_gap_max - _gap_min, 1e-3)
+        _stagger_y_q = (_gap_max + 0.05 * _gap_span, _gap_max + 0.18 * _gap_span)
+        for _i, _n in enumerate(_names):
+            _arr = _traces[_n][1]
+            if len(_arr) == 0:
+                continue
+            _xs = _i + _rng.uniform(-0.12, 0.12, size=len(_arr))
+            _ax_q.scatter(_xs, _arr, s=28, alpha=0.75,
+                          color=_colors.get(_n, "gray"),
+                          edgecolor="black", linewidth=0.4, zorder=4)
+            _mu = float(np.mean(_arr))
+            _se = float(np.std(_arr, ddof=1) / np.sqrt(len(_arr))) if len(_arr) > 1 else 0.0
+            _ax_q.errorbar(_i, _mu, yerr=_se, fmt="D", color="white",
+                           markerfacecolor="black", markeredgecolor="black",
+                           markersize=7, capsize=5, zorder=5)
+            _y_text = _stagger_y_q[_i % 2]
+            _ax_q.text(_i, _y_text, f"μ={_mu:.2f}±{_se:.02f}",
+                       ha="center", va="bottom", fontsize=8)
         _ax_q.axhline(0, color="grey", linewidth=0.6)
-        _ax_q.legend(fontsize=8, loc="upper left")
+        _ax_q.set_xticks(_positions)
+        _ax_q.set_xticklabels(_names, fontsize=8, rotation=30, ha="right")
+        _ax_q.set_ylabel(r"final cumulative $\Delta_Q$ (regret vs. oracle)")
+        _ax_q.set_ylim(min(_gap_min - 0.05 * _gap_span, -0.05),
+                        _gap_max + 0.35 * _gap_span)
+        _ax_q.set_title(
+            f"Per-seed Q-gap  •  {_env_label}  •  lower is better",
+            fontsize=10,
+        )
 
         _err_md = ""
         if _errors:
             _err_md = "\n\n_Skipped:_  " + "  ·  ".join(
                 f"**{n}** ({why})" for n, why in _errors.items()
             )
-        _out = mo.vstack([_fig, mo.md(_err_md)] if _err_md else [_fig])
+        _elapsed = _time.time() - _t0
+        _ran = len(_traces)
+        _done_md = mo.md(
+            f"✓ Planner comparison finished in **{_elapsed:.1f} s** — "
+            f"{_ran} planner(s) rolled out × {len(SEEDS)} seeds × "
+            f"{MAX_STEPS} steps." + _err_md
+        )
+        _out = mo.vstack([_fig, _done_md])
     _out
     return
 
-
-# ============================================================
-# Where each algorithm shines — three crafted scenarios
-# ============================================================
 
 @app.cell(hide_code=True)
 def _(mo):
@@ -5548,18 +6320,20 @@ def _(mo):
     return
 
 
-# ----------------- Scenario helpers (shared across A/B/C) ---------
-
 @app.cell
-def _(np, plt):
+def _(np, ns_oracle_vi, plt):
     import time as _time_mod
 
     _PLANNER_COLORS = {
-        "stale-VI":  "tab:red",
-        "MCTS":      "tab:blue",
-        "PA-MCTS":   "tab:orange",
-        "RATS":      "tab:purple",
-        "DQN (SB3)": "tab:green",
+        "Oracle VI":     "#1a1a1a",  # near-black, signals "ceiling"
+        "stale-VI":      "tab:red",
+        "MCTS":          "tab:blue",
+        "PA-MCTS":       "tab:orange",
+        "PA-MCTS α=0.25": "#ffbb78",  # light orange
+        "PA-MCTS α=0.50": "tab:orange",
+        "PA-MCTS α=0.75": "#d97706",  # dark orange
+        "RATS":          "tab:purple",
+        "DQN (SB3)":     "tab:green",
     }
 
     def _scenario_default_kwargs():
@@ -5570,7 +6344,7 @@ def _(np, plt):
             "PAMCTS_ALPHA": 0.5,
             "PAMCTS_MCTS_KWARGS": dict(d=20, m=20, c=1.4, gamma=0.95),
             "SB3_DQN_PATH": "model_weights/contextual_ddqn_frozenlake.zip",
-            "N_SEEDS": 3,
+            "N_SEEDS": 20,
             "ENV_L": 0.15,
             "ORACLE_GAMMA": 0.95,
         }
@@ -5613,10 +6387,33 @@ def _(np, plt):
             a, _ = agent.search()
             return int(a)
 
+        def _rats_inject_hole_penalty(penv):
+            """Replace transitions of the form (p, ns, 0, done=True) --
+            i.e. landing on a hole -- with (p, ns, -1, done=True) so
+            RATS' shallow worst-case minimax has a usable gradient.
+            FrozenLake-style P (dict-of-(prob, ns, r, done) tuples)
+            only -- non-dict P (e.g. Bridge slip-vector) is left alone."""
+            P = penv.unwrapped.P
+            if not isinstance(P, dict):
+                return penv
+            new_P = {
+                s: {
+                    a: [
+                        (p, ns, -1.0 if (d and r <= 0) else float(r), d)
+                        for p, ns, r, d in P[s][a]
+                    ] for a in P[s]
+                } for s in P
+            }
+            penv.P = new_P
+            penv.unwrapped.P = new_P
+            if hasattr(penv, "intial_p"):
+                penv.intial_p = new_P
+            return penv
+
         def rats_pick(state, _t, env):
             if RATS_cls is None:
                 raise RuntimeError("RATS unavailable")
-            penv = env.get_planning_env()
+            penv = _rats_inject_hole_penalty(env.get_planning_env())
             return int(RATS_cls(
                 action_space=penv.action_space, **kwargs["RATS_KWARGS"],
             ).act(observation=int(state), env=penv))
@@ -5628,70 +6425,175 @@ def _(np, plt):
             action, _ = dqn_model.predict(obs_vec, deterministic=True)
             return int(action)
 
-        def pamcts_pick(state, _t, env):
+        def make_pamcts_pick(alpha):
+            """Return a PA-MCTS picker bound to the given α. Uses
+            the canonical ``ns_gym.benchmark_algorithms.PAMCTS`` class
+            via its new ``q_value_fn`` kwarg, which lets us plug in the
+            SB3 contextual DDQN through ``StableBaselineWrapper``
+            without converting weights to a raw ``.pth`` state dict.
+            Same MCTS configuration as the standalone MCTS planner --
+            only the DDQN-prior mixing weight α differs."""
             if dqn_model is None:
-                raise RuntimeError("SB3 model not loaded")
-            penv = env.get_planning_env()
-            mcts = MCTS_cls(
-                penv, state=int(state), **kwargs["PAMCTS_MCTS_KWARGS"],
+                return None
+            from ns_gym.base import StableBaselineWrapper
+            from ns_gym.benchmark_algorithms import PAMCTS
+            mcts_kw = kwargs["MCTS_KWARGS"]
+            wrap = StableBaselineWrapper(
+                dqn_model,
+                obs_fn=lambda state, env: _sb3_obs_vec(state, env),
             )
-            _, mcts_q = mcts.search()
-            mcts_q = np.asarray(mcts_q, dtype=np.float32)
-            obs_vec = _sb3_obs_vec(state, env)
-            import torch
-            with torch.no_grad():
-                t_in = torch.as_tensor(obs_vec, dtype=torch.float32).unsqueeze(0)
-                ddqn_q = dqn_model.q_net(t_in).cpu().numpy().ravel().astype(
-                    np.float32
-                )
-            eps = 1e-8
-            mcts_n = (mcts_q - mcts_q.min()) / (mcts_q.max() - mcts_q.min() + eps)
-            ddqn_n = (ddqn_q - ddqn_q.min()) / (ddqn_q.max() - ddqn_q.min() + eps)
-            alpha = float(kwargs["PAMCTS_ALPHA"])
-            return int(np.argmax(alpha * ddqn_n + (1 - alpha) * mcts_n))
+            agent = PAMCTS(
+                alpha=alpha,
+                mcts_iter=mcts_kw["m"],
+                mcts_search_depth=mcts_kw["d"],
+                mcts_discount_factor=mcts_kw["gamma"],
+                mcts_exploration_constant=mcts_kw["c"],
+                state_space_size=16, action_space_size=4,
+                q_value_fn=wrap.q_values,
+            )
+            def _pick(state, _t, env):
+                return int(agent.act(int(state), env.get_planning_env()))
+            return _pick
 
         return {
             "stale-VI":  stale_pick,
             "MCTS":      mcts_pick,
-            "PA-MCTS":   pamcts_pick,
+            "PA-MCTS":   make_pamcts_pick(float(kwargs["PAMCTS_ALPHA"])),
             "RATS":      rats_pick,
             "DQN (SB3)": dqn_pick,
+            # The factory used by scenario A's α-sweep.
+            "_make_pamcts_pick": make_pamcts_pick,
         }
 
     def run_scenario_metrics(
         env_factory, planners, oracle_P, oracle_R, oracle_V,
         gamma, n_seeds, max_steps, type_mismatch_checker,
+        progress_wrap=None,
     ):
         """Run every planner; capture per-step cum reward, cum Q-gap,
-        param trace, decision times. Returns (metrics, errors)."""
+        decision times, and per-seed final returns. Returns (metrics, errors).
+
+        Oracle VI is auto-prepended as the ceiling baseline. Crucially,
+        for envs whose drift sequence is stochastic across seeds (e.g.
+        ``LCBoundedDistrubutionUpdate``), the ceiling is *rebuilt per
+        seed* using that seed's actual drift trajectory. Otherwise the
+        precomputed-once oracle (built for seed 0) under-represents the
+        true optimum on later seeds, and a robust planner like RATS can
+        appear to beat it -- which is impossible by construction.
+        """
+
+        def _seed_env_inner_rngs(env, sd):
+            """Reseed any RNG-bearing update functions on env so each
+            seed gets a reproducible drift sequence and every planner
+            sees the SAME drift per seed (fair head-to-head). No-op for
+            envs whose update fns don't carry an RNG."""
+            try:
+                upd = getattr(env, "update_fn", None)
+                if upd is None:
+                    return
+                if hasattr(upd, "seed"):
+                    upd.seed(sd)
+                inner = getattr(upd, "update_fn", None)
+                if inner is not None and hasattr(inner, "seed"):
+                    inner.seed(sd)
+            except Exception:
+                pass
+
+        def _build_oracle_for_seed(sd):
+            """Snapshot the env's drift trajectory under seed `sd` and run
+            VI on the resulting time-indexed (P, R) tensors. This is the
+            *true* optimal policy for the drift this seed will actually
+            experience -- not the precomputed seed-0 oracle."""
+            try:
+                e = env_factory()
+                e.reset(seed=sd)
+                _seed_env_inner_rngs(e, sd)
+                n_states = e.unwrapped.observation_space.n
+                n_actions = e.unwrapped.action_space.n
+                P_t = np.zeros(
+                    (max_steps, n_states, n_actions, n_states), dtype=np.float64,
+                )
+                R_t = np.zeros(
+                    (max_steps, n_states, n_actions, n_states), dtype=np.float64,
+                )
+                for t in range(max_steps):
+                    e.transition_prob, fired, _ = e.update_fn(
+                        e.transition_prob, t,
+                    )
+                    if fired:
+                        e._update_transition_prob_table()
+                    for s in range(n_states):
+                        for a in range(n_actions):
+                            for prob, sp, reward, _ in e.P[s][a]:
+                                P_t[t, s, a, sp] += float(prob)
+                                R_t[t, s, a, sp] = float(reward)
+                V_t, _ = ns_oracle_vi(P_t, R_t, gamma)
+                return P_t, R_t, V_t
+            except Exception:
+                # Env doesn't expose update_fn / P / etc. in the form we
+                # need -- fall back to the precomputed once-built oracle.
+                return oracle_P, oracle_R, oracle_V
+
+        # Cache per-seed oracle tensors -- shared across all planners
+        # since they only depend on the env's drift, not the planner.
+        _seed_oracles = {}
+
+        def _get_seed_oracle(sd):
+            if sd not in _seed_oracles:
+                _seed_oracles[sd] = _build_oracle_for_seed(sd)
+            return _seed_oracles[sd]
+
+        # "Active oracle" mutated by the per-seed loop and consulted by
+        # both _oracle_q (for Q-gap) and _oracle_pick (for Oracle VI).
+        _active = {"P": oracle_P, "R": oracle_R, "V": oracle_V}
 
         def _oracle_q(t_idx, state):
-            n_a = oracle_P.shape[2]
-            n_s = oracle_P.shape[1]
+            P_a, R_a, V_a = _active["P"], _active["R"], _active["V"]
+            n_a = P_a.shape[2]
+            n_s = P_a.shape[1]
             return np.array([
                 sum(
-                    oracle_P[t_idx, state, a, sp]
-                    * (oracle_R[t_idx, state, a, sp]
-                       + gamma * oracle_V[t_idx + 1, sp])
+                    P_a[t_idx, state, a, sp]
+                    * (R_a[t_idx, state, a, sp] + gamma * V_a[t_idx + 1, sp])
                     for sp in range(n_s)
                 )
                 for a in range(n_a)
             ])
 
-        T_ORACLE = oracle_V.shape[0] - 1
-        metrics, errors = {}, {}
+        def _oracle_pick(state, t, _env):
+            T_oracle = _active["V"].shape[0] - 1
+            return int(np.argmax(_oracle_q(min(t, T_oracle - 1), int(state))))
 
-        for name, pick in planners.items():
+        planners = {"Oracle VI": _oracle_pick, **planners}
+
+        metrics, errors = {}, {}
+        _planner_items = list(planners.items())
+        _iter = (
+            progress_wrap(_planner_items) if progress_wrap is not None
+            else _planner_items
+        )
+
+        for name, pick in _iter:
             try:
                 cum_r_acc = np.zeros(max_steps, dtype=np.float64)
                 cum_q_acc = np.zeros(max_steps, dtype=np.float64)
                 param_acc = np.zeros(max_steps, dtype=np.float64)
                 n_acc = np.zeros(max_steps, dtype=np.int32)
                 decision_times_us = []
+                final_returns = []  # one per seed, for the violin plot
 
                 for s in range(n_seeds):
+                    # Activate THIS seed's oracle tensors so the Oracle
+                    # VI picker and the Q-gap computation both reflect
+                    # the optimal policy for the drift this seed will
+                    # actually experience.
+                    P_s, R_s, V_s = _get_seed_oracle(s)
+                    _active["P"], _active["R"], _active["V"] = P_s, R_s, V_s
+                    T_oracle_s = V_s.shape[0] - 1
+
                     env = env_factory()
                     obs, _ = env.reset(seed=s)
+                    _seed_env_inner_rngs(env, s)
                     state, _ = type_mismatch_checker(obs)
                     np.random.seed(s)
                     cum_r, cum_q = 0.0, 0.0
@@ -5699,7 +6601,7 @@ def _(np, plt):
                     done = trunc = False
                     t = 0
                     while not (done or trunc) and t < max_steps:
-                        t_idx = min(t, T_ORACLE - 1)
+                        t_idx = min(t, T_oracle_s - 1)
                         qa = _oracle_q(t_idx, int(state))
                         a_oracle = int(np.argmax(qa))
 
@@ -5727,12 +6629,14 @@ def _(np, plt):
                         param_acc[t] += last_param
                         n_acc[t] += 1
                         t += 1
+                    final_returns.append(float(cum_r))
 
                 metrics[name] = {
                     "cum_reward":     cum_r_acc / np.maximum(n_acc, 1),
                     "cum_q_gap":      cum_q_acc / np.maximum(n_acc, 1),
                     "param_trace":    param_acc / np.maximum(n_acc, 1),
                     "decision_times": decision_times_us,
+                    "final_returns":  np.asarray(final_returns),
                 }
             except Exception as e:
                 errors[name] = f"{type(e).__name__}: {e}"
@@ -5740,44 +6644,93 @@ def _(np, plt):
         return metrics, errors
 
     def plot_scenario_panel(
-        metrics, errors, title, ylim_reward=(-0.05, 1.05), plt_mod=plt,
+        metrics, errors, title, ylim_reward=None, plt_mod=plt,
     ):
-        """2x2: param trace · cum reward / cum Q-gap · decision time box."""
-        fig, axes = plt_mod.subplots(2, 2, figsize=(12, 7), layout="constrained")
-        (ax_p, ax_r), (ax_q, ax_d) = axes
+        """1x2 panel:
+            (L) per-seed return distribution (violin + strip + mean ± SE)
+            (R) per-step decision time (log-scale box)
 
-        for name, m in metrics.items():
-            color = _PLANNER_COLORS.get(name, "gray")
-            ax_p.plot(m["param_trace"], color=color, label=name,
-                      linewidth=1.6, marker="o", markersize=3)
-            ax_r.plot(m["cum_reward"], color=color, label=name,
-                      linewidth=1.6, marker="o", markersize=3)
-            ax_q.plot(m["cum_q_gap"], color=color, label=name,
-                      linewidth=1.6, marker="o", markersize=3)
+        The parameter-trace subplot was removed -- with seeded LC drift
+        every planner sees the *same* drift sequence per seed, so all
+        the per-method param traces overlapped exactly and added nothing.
+        The cumulative-reward-over-time subplot was also dropped; it's
+        uninformative for terminal-only-reward envs (FrozenLake's binary
+        0/1, CartPole's survival counter) where the curve is a flat line
+        with a single late jump. The violin carries the comparison.
 
-        ax_p.set_title(r"Parameter trace — $P[\text{intended}]$ over time",
-                       fontsize=10)
-        ax_p.set_xlabel("step")
-        ax_p.set_ylabel(r"$P[\text{intended}]$")
-        ax_p.set_ylim(-0.05, 1.05)
-        ax_p.legend(fontsize=7, loc="upper right")
+        ``ylim_reward`` is accepted for back-compat but unused.
+        """
+        del ylim_reward
+        fig, (ax_v, ax_d) = plt_mod.subplots(
+            1, 2, figsize=(13, 5.0), layout="constrained",
+            gridspec_kw={"width_ratios": [1.15, 1.0]},
+        )
 
-        ax_r.set_title("Cumulative reward (mean over seeds)", fontsize=10)
-        ax_r.set_xlabel("step")
-        ax_r.set_ylabel("cum reward")
-        if ylim_reward is not None:
-            ax_r.set_ylim(*ylim_reward)
-        ax_r.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
-        ax_r.legend(fontsize=7, loc="lower right")
-
-        ax_q.set_title("Cumulative Q-gap (regret vs oracle, lower is better)",
-                       fontsize=10)
-        ax_q.set_xlabel("step")
-        ax_q.set_ylabel(r"$\sum_t \Delta_Q$")
-        ax_q.axhline(0, color="grey", linewidth=0.6)
-        ax_q.legend(fontsize=7, loc="upper left")
-
+        # ----- per-seed return distribution (violin + strip overlay) -----
         names = list(metrics.keys())
+        positions = list(range(len(names)))
+        n_seeds_max = 0
+        if names:
+            returns_per_method = [
+                np.asarray(metrics[n].get("final_returns", []))
+                for n in names
+            ]
+            n_seeds_max = max((len(r) for r in returns_per_method), default=0)
+            non_empty = [
+                (i, r) for i, r in enumerate(returns_per_method) if len(r) > 0
+            ]
+            if non_empty:
+                vp = ax_v.violinplot(
+                    [r for _, r in non_empty],
+                    positions=[i for i, _ in non_empty],
+                    showmeans=False, showmedians=False, showextrema=False,
+                    widths=0.75,
+                )
+                for body, (i, _) in zip(vp["bodies"], non_empty):
+                    body.set_facecolor(_PLANNER_COLORS.get(names[i], "gray"))
+                    body.set_edgecolor("black")
+                    body.set_alpha(0.45)
+                    body.set_linewidth(0.6)
+            rng = np.random.default_rng(0)
+            # Stagger the per-method annotations vertically so they don't
+            # overlap when planner names are wide (e.g. "PA-MCTS α=0.25").
+            stagger_y = (1.10, 1.28)
+            for i, name in enumerate(names):
+                r = returns_per_method[i]
+                if len(r) == 0:
+                    continue
+                color = _PLANNER_COLORS.get(name, "gray")
+                xs = i + rng.uniform(-0.12, 0.12, size=len(r))
+                ax_v.scatter(
+                    xs, r, s=28, alpha=0.75, color=color,
+                    edgecolor="black", linewidth=0.4, zorder=4,
+                )
+                mu = float(np.mean(r))
+                se = float(np.std(r, ddof=1) / np.sqrt(len(r))) if len(r) > 1 else 0.0
+                ax_v.errorbar(
+                    i, mu, yerr=se, fmt="D", color="white",
+                    markerfacecolor="black", markeredgecolor="black",
+                    markersize=7, capsize=5, zorder=5,
+                )
+                wins = int(np.sum(np.asarray(r) > 0))
+                y_text = stagger_y[i % 2]
+                ax_v.text(
+                    i, y_text,
+                    f"μ={mu:.2f}±{se:.02f}\n{wins}/{len(r)} goals",
+                    ha="center", va="bottom", fontsize=8,
+                )
+        ax_v.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
+        ax_v.axhline(1, color="grey", linewidth=0.5, alpha=0.4)
+        ax_v.set_xticks(positions)
+        ax_v.set_xticklabels(names, fontsize=8, rotation=30, ha="right")
+        ax_v.set_ylabel("return per seed (1 = goal reached)")
+        ax_v.set_ylim(-0.15, 1.65)
+        ax_v.set_title(
+            f"Per-seed return distribution  (N={n_seeds_max})",
+            fontsize=10,
+        )
+
+        # ------------------- decision-time box plot ----------------------
         if names:
             data = [metrics[n]["decision_times"] for n in names]
             bp = ax_d.boxplot(
@@ -5790,7 +6743,9 @@ def _(np, plt):
             ax_d.set_yscale("log")
         ax_d.set_ylabel("decision time per step (μs, log)")
         ax_d.set_title("Per-step decision time", fontsize=10)
-        ax_d.tick_params(axis="x", rotation=15)
+        ax_d.tick_params(axis="x", rotation=30)
+        for label in ax_d.get_xticklabels():
+            label.set_horizontalalignment("right")
         ax_d.grid(axis="y", which="both", alpha=0.25)
 
         fig.suptitle(title, fontsize=11, fontweight=600)
@@ -5805,25 +6760,91 @@ def _(np, plt):
     )
 
 
-# ----------------- Scenario A: PA-MCTS shines ---------------------
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">A · PA-MCTS — single notified shock + stale prior</div></div>
 
-    **Recipe.** A FrozenLake env that runs deterministically for the
-    first 5 steps, then a *single* `DistributionStepWiseUpdate` jumps
-    `P[intended]` from 1.0 to 0.4 — a hard slip cliff. The agent gets
-    `change_notification + delta_change_notification`, so by step 6
-    everyone *knows* the world moved.
+    ### The setup
 
-    Stale-VI doesn't care (it never replans). DDQN's contextual policy
-    sees the new $\theta$ but was trained on a different region.
-    MCTS plans against the post-cliff snapshot but with no value prior.
-    **PA-MCTS** combines the contextual DDQN's value estimates with
-    MCTS-corrected Q-values for the unseen slip — the regime the
-    method was designed for.
+    | Component | Choice | Why |
+    | :-- | :-- | :-- |
+    | **Env** | `FrozenLake-v1` (4×4, `is_slippery=False`) | Same grid as scenarios B/C; the choice that varies is the *temporal* dynamics. |
+    | **Initial slip** | `[0.45, 0.275, 0.275]` | Just *below* the contextual DDQN's training band of `Uniform[0.5, 1.0]`, so even the prior is mildly OOD pre-shock. |
+    | **Shock** | At step 1, `DistributionStepWiseUpdate` fires once and bumps `P[intended]` up to **0.55**. | Lands the env just *inside* the DDQN's training distribution -- the DDQN's post-shock Q-values are now *partially-calibrated*, the regime where mixing with MCTS pays. |
+    | **Notification** | `change_notification=True`, `delta_change_notification=True` | Every planner gets full visibility into the post-shock model via `env.get_planning_env()` -- nothing is hidden; the comparison is purely about how each method *uses* the information. |
+    | **DDQN** | `model_weights/contextual_ddqn_frozenlake.zip` | Contextual DDQN trained on `Uniform[0.5, 1.0]` slip. The shocked slip 0.55 sits at the lower edge of training, so the prior is good-but-imperfect. |
+    | **MCTS budget** | `m=15, d=20, c=1.4, γ=0.95` (same for MCTS-alone *and* every PA-MCTS) | Tight enough that MCTS' Q-values carry real noise -- exactly when a calibrated prior earns its keep. |
+
+    ### What each method is doing
+
+    - **MCTS** plans against the live post-shock snapshot every step but
+      starts from scratch -- no prior over which actions are likely
+      good. At m=15 the search has noticeable variance.
+    - **DQN (SB3)** runs its trained policy unchanged. The new slip
+      sits at the edge of its training distribution: routing intuition
+      transfers, but precise tie-breaking doesn't.
+    - **PA-MCTS** combines them at every step:
+      $\;Q_\text{PA} = \alpha\, Q_\text{DDQN} + (1-\alpha)\, Q_\text{MCTS}$.
+      The DDQN prior breaks ties when MCTS Q-values are noisy; the MCTS
+      lookahead corrects the prior when the world has shifted under it.
+      We sweep α ∈ {0.25, 0.50, 0.75} so you can see the trade-off.
+
+    ### The PA-MCTS interaction loop
+
+    `ns_gym.benchmark_algorithms.PAMCTS` is the canonical class. It
+    rebuilds an MCTS tree internally each step, queries a learned
+    Q-head, normalizes both to `[0, 1]`, and returns
+    `α · Q_DDQN + (1−α) · Q_MCTS`. The Q-head can be wired in two ways:
+
+    **Recommended: SB3 + `StableBaselineWrapper`.** Pass any callable
+    that returns per-action Q-values for `(state, env)` via the new
+    `q_value_fn` kwarg. `ns_gym.base.StableBaselineWrapper` exposes
+    `.q_values(state, env)` that does the SB3 forward pass for you;
+    its `obs_fn=` argument handles the contextual one-hot ⊕ slip
+    observation our DDQN was trained on:
+
+    ```python
+    import numpy as np
+    from stable_baselines3 import DQN
+    from ns_gym.base import StableBaselineWrapper
+    from ns_gym.benchmark_algorithms import PAMCTS
+
+    sb3 = DQN.load("model_weights/contextual_ddqn_frozenlake.zip")
+
+    def obs_fn(state, env):                       # 19-d obs the DDQN expects
+        onehot = np.eye(16, dtype=np.float32)[int(state)]
+        slip = np.asarray(env.transition_prob, dtype=np.float32)
+        return np.concatenate([onehot, slip])
+
+    wrap = StableBaselineWrapper(sb3, obs_fn=obs_fn)
+
+    agent = PAMCTS(
+        alpha=0.75,                   # mixing weight on the DDQN prior
+        mcts_iter=15, mcts_search_depth=20,
+        mcts_discount_factor=0.95, mcts_exploration_constant=1.4,
+        state_space_size=16, action_space_size=4,
+        q_value_fn=wrap.q_values,     # any callable f(state, env) -> Q
+    )
+
+    obs, _ = env.reset(seed=0)
+    state = obs["state"]
+    done = trunc = False
+    while not (done or trunc):
+        action = agent.act(state, env.get_planning_env())
+        obs, reward, done, trunc, _ = env.step(int(action))
+        state = obs["state"]
+    ```
+
+    **Legacy: torch architecture + `.pth` state-dict.** Still
+    supported for backward compat. Pass `DDQN_model=arch` (a
+    `torch.nn.Module` instance) and `DDQN_model_path="weights.pth"`
+    instead of `q_value_fn`; PAMCTS then builds an internal
+    `DQNAgent` exactly as before.
+
+    > **The α sweep below uses the recommended path** -- contextual
+    > SB3 weights, `obs_fn` builds the 19-d input, and `PAMCTS`
+    > handles the rest.
     """)
     return
 
@@ -5839,14 +6860,10 @@ def _(mo):
 
 @app.cell
 def _(
-    BurstScheduler,
+    DiscreteScheduler,
     DistributionStepWiseUpdate,
     NSFrozenLakeWrapper,
     build_full_pickers,
-    parse_scenario_kwargs,
-    plot_scenario_panel,
-    run_scenario_metrics,
-    try_load_sb3,
     build_ns_tensors,
     fl_pamcts_run,
     fl_planners_kwargs,
@@ -5854,11 +6871,17 @@ def _(
     gym,
     mo,
     ns_oracle_vi,
+    parse_scenario_kwargs,
+    plot_scenario_panel,
+    run_scenario_metrics,
+    try_load_sb3,
     type_mismatch_checker,
 ):
+    import time as _time
     if not fl_pamcts_run.value:
         _out = mo.md("_Click run to roll **all five planners** on the shock env._")
     else:
+        _t0 = _time.time()
         from ns_gym.benchmark_algorithms import MCTS as _MCTS
         try:
             from ns_gym.benchmark_algorithms import RATS as _RATS
@@ -5866,24 +6889,39 @@ def _(
             _RATS = None
 
         _kw = parse_scenario_kwargs(fl_planners_kwargs.value)
+        # Scenario A overrides (tuned via N=40 sweep so PA-MCTS reliably
+        # beats both MCTS-alone and DQN-alone):
+        #   * Use the *contextual* DDQN trained on Uniform[0.5, 1.0].
+        #     Post-shock slip 0.55 sits just inside the lower edge of
+        #     its training distribution, so the DDQN's prior is
+        #     calibrated-but-imperfect -- exactly the regime where
+        #     MCTS' online correction earns its keep.
+        #   * MCTS budget m=15 so MCTS alone has enough Q-value noise
+        #     for the DDQN prior to actually change the argmax.
+        _kw["SB3_DQN_PATH"] = "model_weights/contextual_ddqn_frozenlake.zip"
+        _kw["MCTS_KWARGS"] = dict(d=20, m=15, c=1.4, gamma=0.95)
         _dqn_model = try_load_sb3(_kw["SB3_DQN_PATH"])
 
-        # Single-shock env factory.
+        # Single-shock env: starts BELOW the contextual DDQN's training
+        # range at p=0.45 (1 step OOD-low), then at step 1 a
+        # DistributionStepWiseUpdate jumps P[intended] *up* to 0.55 --
+        # just inside the DDQN's training band [0.5, 1.0]. The DDQN's
+        # post-shock Q-values are partially-calibrated rather than
+        # garbage. MCTS handles the unfamiliar geometry, DDQN supplies
+        # the action prior, and PA-MCTS reliably tops both.
         def _make_env():
             base = gym.make(
                 "FrozenLake-v1", is_slippery=False, max_episode_steps=50,
             )
-            sched = BurstScheduler(
-                burst_start=5, burst_end=6, single_burst=True,
-            )
+            sched = DiscreteScheduler(event_list={1})
             update_fn = DistributionStepWiseUpdate(
-                scheduler=sched, target=[0.4, 0.3, 0.3],
+                scheduler=sched, update_values=[[0.55, 0.225, 0.225]],
             )
             return NSFrozenLakeWrapper(
                 base, {"P": update_fn},
                 change_notification=True,
                 delta_change_notification=True,
-                initial_prob_dist=[1.0, 0.0, 0.0],
+                initial_prob_dist=[0.45, 0.275, 0.275],
             )
 
         _MAX = 30
@@ -5894,55 +6932,143 @@ def _(
         _P, _R = build_ns_tensors(_make_env, _MAX, seed=0)
         _V, _ = ns_oracle_vi(_P, _R, _gamma)
 
-        _planners = build_full_pickers(
+        # Scenario A is the "PA-MCTS regime" -- the headline comparison
+        # is MCTS vs. DQN vs. PA-MCTS at multiple mixing weights (α).
+        # All four tree-searchers (MCTS + 3x PA-MCTS) use the SAME
+        # MCTS_KWARGS so the only thing that varies is α. stale-VI and
+        # RATS are dropped here to keep the bar chart focused on
+        # whether PA-MCTS' DDQN-prior + MCTS-lookahead beats either
+        # baseline alone.
+        _base_planners = build_full_pickers(
             _kw, _dqn_model, fl_stationary_policy, _MCTS, _RATS,
         )
+        _make_pamcts = _base_planners.pop("_make_pamcts_pick", None)
+        _planners = {
+            "MCTS":      _base_planners["MCTS"],
+            "DQN (SB3)": _base_planners["DQN (SB3)"],
+        }
+        if _make_pamcts is not None:
+            for _a in (0.25, 0.50, 0.75):
+                _planners[f"PA-MCTS α={_a:.2f}"] = _make_pamcts(_a)
+
+        def _progress(it):
+            return mo.status.progress_bar(
+                it, title="Scenario A — PA-MCTS α sweep",
+                subtitle="rolling out each planner…",
+                remove_on_exit=True,
+            )
+
         _metrics, _errors = run_scenario_metrics(
             _make_env, _planners, _P, _R, _V, _gamma, _N, _MAX,
-            type_mismatch_checker,
+            type_mismatch_checker, progress_wrap=_progress,
         )
         _fig = plot_scenario_panel(
             _metrics, _errors,
-            "Scenario A · Single notified shock at step 5  ·  PA-MCTS regime",
+            "Scenario A · init=[0.45, 0.275, 0.275] -> shock at t=1 to "
+            "[0.55, 0.225, 0.225]  ·  contextual DDQN  ·  "
+            "MCTS m=15 (same for all four)",
         )
         _err_md = (
             "\n\n_Skipped:_  " + "  ·  ".join(
                 f"**{n}** ({why})" for n, why in _errors.items()
             ) if _errors else ""
         )
-        _out = mo.vstack([_fig, mo.md(_err_md)] if _err_md else [_fig])
+        _done_md = mo.md(
+            f"✓ Scenario A finished in **{_time.time() - _t0:.1f} s** — "
+            f"{len(_metrics)} planner(s) × {_N} seeds × {_MAX} steps."
+            + _err_md
+        )
+        _out = mo.vstack([_fig, _done_md])
     _out
     return
 
-
-# ----------------- Scenario B: RATS shines ------------------------
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">B · RATS — bounded-but-sharp Lipschitz drift</div></div>
 
-    **Recipe.** Same FrozenLake, but now `P[intended]` is moved by
-    NS-Gym's `LCBoundedDistrubutionUpdate` — the Lipschitz-continuous
-    transition function from Lecarpentier & Rachelson (2019, the
-    same paper that introduced RATS). At every step it samples a
-    fresh distribution from `RandomCategorical`, *but only accepts*
-    the new distribution if
+    ### The setup
 
-    $$W_1\bigl(P_t(\cdot \mid s,a),\, P_{t+1}(\cdot \mid s,a)\bigr) \le L,$$
+    | Component | Choice | Why |
+    | :-- | :-- | :-- |
+    | **Env** | `FrozenLake-v1` (4×4, `is_slippery=False`) | Reproduces the discrete grid the RATS paper uses. |
+    | **Drift** | `LCBoundedDistrubutionUpdate(L=0.05)` | Lipschitz-continuous slip drift from Lecarpentier & Rachelson 2019 — the regime RATS is designed for. |
+    | **Initial slip** | `[0.7, 0.15, 0.15]` | Start in the stochastic regime (not deterministic) so the drift bites from step 0. |
+    | **Rewards** | `H = -1`, `G = +1`, `F = 0`, `S = 0` | Gives RATS' shallow tree a usable gradient — without a hole penalty, every depth-2 leaf returns 0 and the worst-case minimax has nothing to discriminate. |
+    | **Episode horizon** | `_MAX = 50` steps | RATS plans cautiously and takes detours; cutting at 30 amputates ~half its goal-reaching trajectories. |
+    | **Agent budgets** | RATS depth=2, $L_p$=1.0  ·  MCTS d=20, m=30 | The configuration where RATS dominates the LC-drift benchmark. |
 
-    where $W_1$ is the Wasserstein-1 distance and $L$ is the
-    Lipschitz constant. Result: the slip distribution wanders
-    randomly but each step's move is bounded.
+    ### What's happening at every step
 
-    MCTS plans against the *current* snapshot — when reality is
-    about to drift sharply within the ball, MCTS still picks
-    aggressive paths because "right now" the env still looks safe.
-    **RATS** plans against the *worst* model in a Lipschitz-$L$
-    ball around the current snapshot, so it pre-empts adversarial
-    moves the bound permits. The `L_p` kwarg in the editor above is
-    the *agent's* Lipschitz constant — set it equal to (or larger
-    than) the env's `L` for a faithful match.
+    1. **Env drifts.** A fresh slip distribution is sampled from
+       `RandomCategorical`, *but only accepted* if
+
+       $$W_1\bigl(P_t(\cdot\mid s,a),\, P_{t+1}(\cdot\mid s,a)\bigr) \le L,$$
+
+       so the slip wanders randomly but each move is bounded
+       in 1-Wasserstein distance — no jumps larger than `L`.
+
+    2. **Each planner sees the same snapshot.**
+       `env.get_planning_env()` returns a deepcopy of the *current*
+       MDP. Nobody peeks at future drift.
+
+    3. **They differ in what they plan against:**
+
+       - **MCTS** plans against the snapshot as if it were the future
+         too. When reality is about to drift sharply within the ball,
+         MCTS still picks aggressive paths because *right now* the env
+         still looks safe.
+       - **RATS** plans against the *worst* model inside a Lipschitz
+         ball of radius $d \cdot L_p \cdot \tau$ around the snapshot
+         (one ball per chance node, growing with depth). It pre-empts
+         the adversarial drifts the bound permits.
+
+    ### The knob to know
+
+    `L_p` (in `RATS_KWARGS`) is the *agent's* Lipschitz constant —
+    how paranoid the worst-case ball is. **Rule of thumb:** set
+    `L_p ≥ ENV_L` for a faithful match. Setting `L_p` too small
+    leaves RATS unprepared for legal drifts; setting it too large
+    makes every action look adversarial and RATS gives up.
+
+    *Defaults below are tuned to the configuration where RATS
+    consistently reaches the goal while MCTS falls into a hole on
+    every seed.*
+
+    ### The RATS interaction loop
+
+    RATS lives at `ns_gym.benchmark_algorithms.RATS`. Its only inputs
+    are the live planning env and the agent's Lipschitz constants:
+
+    ```python
+    from ns_gym.benchmark_algorithms import RATS
+
+    obs, _ = env.reset(seed=0)
+    state = obs["state"]
+    done = trunc = False
+    while not (done or trunc):
+        # Snapshot the current MDP (post-drift, post-update_fn fire)
+        penv = env.get_planning_env()
+
+        # Build a fresh RATS planner on that snapshot. L_p is the
+        # *agent's* Lipschitz bound; max_depth controls tree depth.
+        agent = RATS(
+            action_space=penv.action_space,
+            gamma=0.95, max_depth=2,
+            L_p=1.0, L_r=0.0, tau=1.0,
+        )
+        action = agent.act(observation=state, env=penv)
+
+        obs, reward, done, trunc, _ = env.step(int(action))
+        state = obs["state"]
+    ```
+
+    > **Note.** RATS reads rewards from `penv.unwrapped.P[s][a][i][2]`,
+    > i.e. the env's transition table. On sparse-reward FrozenLake the
+    > tutorial scenarios inject a hole=-1 penalty into the planning
+    > env's `P` so the depth-2 worst-case minimax has a usable
+    > gradient. See `_inject_hole_penalty` in the scenario cell.
     """)
     return
 
@@ -5960,10 +7086,6 @@ def _(
     LCBoundedDistrubutionUpdate,
     NSFrozenLakeWrapper,
     build_full_pickers,
-    parse_scenario_kwargs,
-    plot_scenario_panel,
-    run_scenario_metrics,
-    try_load_sb3,
     build_ns_tensors,
     fl_planners_kwargs,
     fl_rats_run,
@@ -5971,14 +7093,20 @@ def _(
     gym,
     mo,
     ns_oracle_vi,
+    parse_scenario_kwargs,
+    plot_scenario_panel,
+    run_scenario_metrics,
+    try_load_sb3,
     type_mismatch_checker,
 ):
+    import time as _time
     if not fl_rats_run.value:
         _out = mo.md(
             "_Click run to roll **all five planners** on a Lipschitz-bounded "
             "random drift (Lecarpentier & Rachelson 2019)._"
         )
     else:
+        _t0 = _time.time()
         from ns_gym.benchmark_algorithms import MCTS as _MCTS
         try:
             from ns_gym.benchmark_algorithms import RATS as _RATS
@@ -5989,6 +7117,11 @@ def _(
         _dqn_model = try_load_sb3(_kw["SB3_DQN_PATH"])
         _ENV_L = float(_kw.get("ENV_L", 0.15))
 
+        # The "real" env everyone is *scored* on. Sparse rewards
+        # (goal=+1, hole=0, frozen=0) so all five planners' cum_reward
+        # lives in [0, 1] -- a fair, comparable y-axis.
+        # initial_prob_dist=[0.7, 0.15, 0.15] starts in the stochastic
+        # regime so the LC drift bites immediately.
         def _make_env():
             base = gym.make(
                 "FrozenLake-v1", is_slippery=False, max_episode_steps=50,
@@ -6000,10 +7133,55 @@ def _(
                 base, {"P": update_fn},
                 change_notification=True,
                 delta_change_notification=True,
-                initial_prob_dist=[1.0, 0.0, 0.0],
+                initial_prob_dist=[0.7, 0.15, 0.15],
             )
 
-        _MAX = 30
+        # RATS plans against a *private* hole-penalty view of the same
+        # snapshot. Without a negative hole signal, every depth-2 leaf
+        # of RATS' tree returns 0 (goal is too far to see) and the
+        # worst-case minimax has nothing to discriminate. We mutate the
+        # planning env's P to inject hole=-1, goal=+1; the real env it
+        # acts in still emits sparse rewards, so RATS is scored on the
+        # same scale as MCTS / PA-MCTS / DQN.
+        def _inject_hole_penalty(penv):
+            # Walk the transition table once and replace the reward field
+            # of every absorbing-with-zero-reward transition (the hole
+            # absorbing self-loops + transitions INTO holes) with -1.
+            # Goal transitions (done=True with r>0) are left untouched.
+            P = penv.unwrapped.P
+            new_P = {}
+            for s in P:
+                new_P[s] = {}
+                for a in P[s]:
+                    rebuilt = []
+                    for prob, ns, r, done in P[s][a]:
+                        if done and r <= 0:
+                            rebuilt.append((prob, ns, -1.0, done))
+                        else:
+                            rebuilt.append((prob, ns, float(r), done))
+                    new_P[s][a] = rebuilt
+            # IMPORTANT: NSFrozenLakeWrapper.__deepcopy__ (called by
+            # RATS.act -> deepcopy(env)) rebuilds unwrapped.P from
+            # `self.P` (the wrapper attribute). So we must update BOTH
+            # the wrapper's .P and the unwrapped env's .P, otherwise the
+            # mutation is silently lost and RATS plans against sparse
+            # rewards (= no gradient = picks arbitrarily = 0% goals).
+            penv.P = new_P
+            penv.unwrapped.P = new_P
+            penv.intial_p = new_P
+            return penv
+
+        def _rats_pick(state, _t, env):
+            if _RATS is None:
+                raise RuntimeError("RATS unavailable")
+            penv = _inject_hole_penalty(env.get_planning_env())
+            return int(_RATS(
+                action_space=penv.action_space, **_kw["RATS_KWARGS"],
+            ).act(observation=int(state), env=penv))
+
+        # RATS plans cautiously and detours -- shorter horizons amputate
+        # ~half its goal-reaching trajectories, so give it 50 steps.
+        _MAX = 50
         _N = int(_kw["N_SEEDS"])
         _gamma = float(_kw["ORACLE_GAMMA"])
 
@@ -6013,9 +7191,24 @@ def _(
         _planners = build_full_pickers(
             _kw, _dqn_model, fl_stationary_policy, _MCTS, _RATS,
         )
+        # build_full_pickers exposes a "_make_pamcts_pick" factory used by
+        # scenario A's α sweep -- not a real picker, so drop it before
+        # passing the dict to run_scenario_metrics.
+        _planners.pop("_make_pamcts_pick", None)
+        # Override RATS' picker with the hole-penalty-augmented version.
+        if "RATS" in _planners:
+            _planners["RATS"] = _rats_pick
+
+        def _progress(it):
+            return mo.status.progress_bar(
+                it, title="Scenario B — RATS Lipschitz",
+                subtitle="rolling out each planner…",
+                remove_on_exit=True,
+            )
+
         _metrics, _errors = run_scenario_metrics(
             _make_env, _planners, _P, _R, _V, _gamma, _N, _MAX,
-            type_mismatch_checker,
+            type_mismatch_checker, progress_wrap=_progress,
         )
         _fig = plot_scenario_panel(
             _metrics, _errors,
@@ -6026,61 +7219,128 @@ def _(
                 f"**{n}** ({why})" for n, why in _errors.items()
             ) if _errors else ""
         )
-        _out = mo.vstack([_fig, mo.md(_err_md)] if _err_md else [_fig])
+        _done_md = mo.md(
+            f"✓ Scenario B finished in **{_time.time() - _t0:.1f} s** — "
+            f"{len(_metrics)} planner(s) × {_N} seeds × {_MAX} steps."
+            + _err_md
+        )
+        _out = mo.vstack([_fig, _done_md])
     _out
     return
 
 
-# ----------------- Scenario C: DDQN edge in latency ----------------
-
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">C · DDQN — the latency story (FL gallery env)</div></div>
+    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">C · Contextual MDPs — known new context per episode, stationary within</div></div>
 
-    Tree search and risk-averse planning *make a decision per step*
-    — that decision involves rollouts, LP solves, or both. A learned
-    policy is one forward pass, regardless of state-space size.
+    A different flavor of non-stationarity. Each episode draws a new
+    MDP $M_c$ from a *known* family $\{M_c\}_{c \in \mathcal{C}}$ — here
+    indexed by the slip parameter `p_intended`. **Within** an episode
+    the dynamics are stationary; **across** episodes the context $c$
+    changes and the agent is told the new $c$ at episode start. This is
+    the classic *contextual MDP* setup (Hallak, Di Castro & Mannor,
+    2015): you don't have temporal drift inside a rollout, but you do
+    have a meta-distribution over MDPs the agent must handle.
 
-    Same four metric panels as scenarios A and B, but on **the gallery
-    env you built in Module 1** (`fl_your_make_env`). The bottom-right
-    box plot — log-scale per-step latency — is the headline argument
-    for the reactive-RL family in time-budgeted settings.
+    ### Who's in the bake-off
+
+    | Family | Members | Knows c? | Adapts at decision time? |
+    | :-- | :-- | :-- | :-- |
+    | **Oracle VI** | one VI solve per context | yes (rebuilds Q\* per c) | n/a |
+    | **MCTS** | UCB1 tree from current snapshot | implicit (via `env.P`) | yes |
+    | **RATS** | min-max tree, $L_p$=1 | implicit (via `env.P`) | yes |
+    | **PA-MCTS** | mix of contextual DDQN prior + MCTS Q | yes (DDQN reads $c$) | yes |
+    | **DQN ctx** | contextual DDQN, trained on $p \sim \text{Uniform}[0.5, 1.0]$ | yes (input includes $c$) | no (one forward pass) |
+    | **DQN p=0.70** | stationary DDQN trained at $p$=0.7 only | no (ignores $c$) | no |
+    | **DQN p=0.33** | stationary DDQN trained at $p$≈0.33 only | no (ignores $c$) | no |
+
+    The two stationary DDQNs are baselines: they show what happens
+    when you train at *one* context and deploy across a distribution.
+    The contextual DDQN should generalize across its training band; the
+    stationary ones should each peak near their own training point.
+
+    ### What the plot shows
+
+    For each context $c \in \{0.4, 0.55, 0.7, 0.85, 0.95\}$ we run
+    `N_SEEDS` episodes per planner and report the mean cumulative
+    reward. Each line is one planner's curve over contexts; bands are
+    standard errors. Oracle VI sets the per-context ceiling.
+
+    ### The DQN interaction loop
+
+    The DDQN families are even simpler — load the SB3 weights, build
+    the same observation vector the network was trained on (one-hot
+    state ⊕ slip context), and ask for the deterministic action:
+
+    ```python
+    import numpy as np
+    from stable_baselines3 import DQN
+
+    # Pick whichever you want to demo: contextual or stationary
+    dqn = DQN.load("model_weights/contextual_ddqn_frozenlake.zip")
+    # dqn = DQN.load("model_weights/ddqn_stationary_p0.700.zip")
+    # dqn = DQN.load("model_weights/ddqn_stationary_p0.333.zip")
+
+    def sb3_obs(state, env):
+        onehot = np.eye(16, dtype=np.float32)[int(state)]
+        slip = np.asarray(env.transition_prob, dtype=np.float32)
+        return np.concatenate([onehot, slip])
+
+    obs, _ = env.reset(seed=0)
+    state = obs["state"]
+    done = trunc = False
+    while not (done or trunc):
+        action, _ = dqn.predict(sb3_obs(state, env), deterministic=True)
+        obs, reward, done, trunc, _ = env.step(int(action))
+        state = obs["state"]
+    ```
+
+    The contextual DDQN reads `env.transition_prob` directly so its
+    policy adapts when you change the context between episodes; the
+    stationary DDQNs ignore that input and return the same policy
+    everywhere — exactly the trade-off this scenario visualizes.
     """)
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    fl_latency_run = mo.ui.run_button(
-        label="▶ Run scenario C (gallery env, all four metrics)"
+    fl_context_run = mo.ui.run_button(
+        label="▶ Run scenario C (contextual MDPs)"
     )
-    fl_latency_run
-    return (fl_latency_run,)
+    fl_context_run
+    return (fl_context_run,)
 
 
 @app.cell
 def _(
+    ContinuousScheduler,
+    DistributionNoUpdate,
+    NSFrozenLakeWrapper,
     build_full_pickers,
-    parse_scenario_kwargs,
-    plot_scenario_panel,
-    run_scenario_metrics,
-    try_load_sb3,
     build_ns_tensors,
-    fl_latency_run,
+    fl_context_run,
     fl_planners_kwargs,
     fl_stationary_policy,
-    fl_your_make_env,
+    gym,
     mo,
+    np,
     ns_oracle_vi,
+    parse_scenario_kwargs,
+    plt,
+    try_load_sb3,
     type_mismatch_checker,
 ):
-    if not fl_latency_run.value:
+    import time as _time
+    if not fl_context_run.value:
         _out = mo.md(
-            "_Click run to evaluate all five planners on your gallery env "
-            "with full metric reporting._"
+            "_Click run to evaluate every planner across a 5-point context "
+            "grid (slip ∈ {0.40, 0.55, 0.70, 0.85, 0.95})._"
         )
     else:
+        _t0 = _time.time()
+        import torch
         from ns_gym.benchmark_algorithms import MCTS as _MCTS
         try:
             from ns_gym.benchmark_algorithms import RATS as _RATS
@@ -6088,33 +7348,241 @@ def _(
             _RATS = None
 
         _kw = parse_scenario_kwargs(fl_planners_kwargs.value)
-        _dqn_model = try_load_sb3(_kw["SB3_DQN_PATH"])
-
-        _MAX = 30
+        # Scenario C overrides:
+        #   * Bump MCTS budget so MCTS-alone is competitive on the
+        #     contextual baseline (scenario A intentionally throttles
+        #     MCTS to expose PA-MCTS' advantage; scenario C's question
+        #     is the opposite -- "how do these methods compare when each
+        #     gets a fair search budget").
+        _kw["MCTS_KWARGS"] = dict(d=20, m=30, c=1.4, gamma=0.95)
         _N = int(_kw["N_SEEDS"])
+        _MAX = 30
         _gamma = float(_kw["ORACLE_GAMMA"])
 
-        _P, _R = build_ns_tensors(fl_your_make_env, _MAX, seed=0)
-        _V, _ = ns_oracle_vi(_P, _R, _gamma)
+        # ---- 5-point context grid ----
+        _CONTEXTS = [0.40, 0.55, 0.70, 0.85, 0.95]
 
-        _planners = build_full_pickers(
-            _kw, _dqn_model, fl_stationary_policy, _MCTS, _RATS,
+        # ---- RATS gets a private hole-penalty view of the planning env
+        # (same trick as scenario B). Without this, every RATS leaf at
+        # depth 2 returns 0 reward (goal too far) and the worst-case
+        # minimax has nothing to discriminate -- RATS picks arbitrary
+        # actions and gets 0 across all contexts, defeating the point
+        # of the comparison.
+        def _inject_hole_penalty(penv):
+            P = penv.unwrapped.P
+            new_P = {
+                s: {
+                    a: [
+                        (p, ns, -1.0 if (d and r <= 0) else float(r), d)
+                        for p, ns, r, d in P[s][a]
+                    ] for a in P[s]
+                } for s in P
+            }
+            penv.P = new_P
+            penv.unwrapped.P = new_P
+            penv.intial_p = new_P
+            return penv
+
+        def _make_rats_picker():
+            if _RATS is None:
+                return None
+            def _pick(state, _t, env):
+                penv = _inject_hole_penalty(env.get_planning_env())
+                return int(_RATS(
+                    action_space=penv.action_space,
+                    **_kw["RATS_KWARGS"],
+                ).act(observation=int(state), env=penv))
+            return _pick
+
+        # ---- load all three DDQNs once ----
+        _dqn_ctx = try_load_sb3("model_weights/contextual_ddqn_frozenlake.zip")
+        _dqn_07  = try_load_sb3("model_weights/ddqn_stationary_p0.700.zip")
+        _dqn_03  = try_load_sb3("model_weights/ddqn_stationary_p0.333.zip")
+
+        # ---- per-context stationary env factory ----
+        def _make_env_for(p):
+            base = gym.make(
+                "FrozenLake-v1", is_slippery=False, max_episode_steps=50,
+            )
+            sched = ContinuousScheduler()
+            upd = DistributionNoUpdate(scheduler=sched)
+            return NSFrozenLakeWrapper(
+                base, {"P": upd},
+                change_notification=False,
+                delta_change_notification=False,
+                initial_prob_dist=[p, (1 - p) / 2, (1 - p) / 2],
+            )
+
+        # ---- per-DDQN picker factory (uses live env's slip as context) ----
+        def _sb3_obs(state, env):
+            onehot = np.eye(16, dtype=np.float32)[int(state)]
+            pvec = np.asarray(env.transition_prob, dtype=np.float32)
+            if pvec.size != 3:
+                pvec = np.array(
+                    [pvec[0], (1 - pvec[0]) / 2, (1 - pvec[0]) / 2],
+                    dtype=np.float32,
+                )
+            return np.concatenate([onehot, pvec])
+
+        def _make_dqn_picker(dqn):
+            if dqn is None:
+                return None
+            def _pick(state, _t, env):
+                a, _ = dqn.predict(_sb3_obs(state, env), deterministic=True)
+                return int(a)
+            return _pick
+
+        # ---- per-context VI oracle (env is stationary, so one Q tensor
+        # suffices per context; no per-seed rebuild needed) ----
+        def _build_oracle(env_factory):
+            P, R = build_ns_tensors(env_factory, _MAX, seed=0)
+            V, _ = ns_oracle_vi(P, R, _gamma)
+            return P, R, V
+
+        def _make_oracle_picker(P, R, V):
+            T = V.shape[0] - 1
+            def _pick(state, t, _env):
+                t_idx = min(t, T - 1)
+                Q = np.einsum(
+                    "ap,ap->a",
+                    P[t_idx, int(state)],
+                    R[t_idx, int(state)] + _gamma * V[t_idx + 1],
+                )
+                return int(np.argmax(Q))
+            return _pick
+
+        # ---- per-context evaluation ----
+        def _rollout(picker, env_factory, n_seeds):
+            returns = []
+            for s in range(n_seeds):
+                env = env_factory()
+                obs, _ = env.reset(seed=s)
+                state, _ = type_mismatch_checker(obs)
+                np.random.seed(s)
+                cum_r = 0.0
+                done = trunc = False
+                t = 0
+                while not (done or trunc) and t < _MAX:
+                    a = int(picker(int(state), t, env))
+                    obs, reward, done, trunc, _ = env.step(a)
+                    state, reward = type_mismatch_checker(obs, reward)
+                    cum_r += float(reward)
+                    t += 1
+                returns.append(cum_r)
+            return np.asarray(returns)
+
+        # Planner names + colors (extends the global palette).
+        _planner_names = [
+            "Oracle VI", "MCTS", "RATS",
+            "PA-MCTS", "DQN ctx", "DQN p=0.70", "DQN p=0.33",
+        ]
+        _palette = {
+            "Oracle VI":   "#1a1a1a",
+            "MCTS":        "tab:blue",
+            "RATS":        "tab:purple",
+            "PA-MCTS":     "tab:orange",
+            "DQN ctx":     "tab:green",
+            "DQN p=0.70":  "#7fbf7b",   # lighter green
+            "DQN p=0.33":  "#1b9e77",   # darker green
+        }
+
+        # results[name] = list of (mean_return, sem) per context
+        _results = {n: [] for n in _planner_names}
+        _errors = {}
+
+        _it = mo.status.progress_bar(
+            _CONTEXTS,
+            title="Scenario C — contextual MDPs",
+            subtitle="rolling out each context…",
+            remove_on_exit=True,
         )
-        _metrics, _errors = run_scenario_metrics(
-            fl_your_make_env, _planners, _P, _R, _V, _gamma, _N, _MAX,
-            type_mismatch_checker,
+        for _p in _it:
+            _factory = lambda p=_p: _make_env_for(p)
+
+            # Build per-context oracle.
+            _P, _R, _V = _build_oracle(_factory)
+
+            # Assemble pickers for THIS context.
+            _base = build_full_pickers(
+                _kw, _dqn_ctx, fl_stationary_policy, _MCTS, _RATS,
+            )
+            _base.pop("_make_pamcts_pick", None)
+            _picks = {
+                "Oracle VI":  _make_oracle_picker(_P, _R, _V),
+                "MCTS":       _base["MCTS"],
+                "RATS":       _make_rats_picker(),  # hole-penalty version
+                "PA-MCTS":    _base["PA-MCTS"],   # uses contextual DDQN
+                "DQN ctx":    _make_dqn_picker(_dqn_ctx),
+                "DQN p=0.70": _make_dqn_picker(_dqn_07),
+                "DQN p=0.33": _make_dqn_picker(_dqn_03),
+            }
+
+            for _name in _planner_names:
+                _pk = _picks.get(_name)
+                if _pk is None:
+                    _errors[_name] = "unavailable (model not loaded)"
+                    _results[_name].append((np.nan, np.nan))
+                    continue
+                try:
+                    _rs = _rollout(_pk, _factory, _N)
+                    _mu = float(np.mean(_rs))
+                    _se = float(np.std(_rs, ddof=1) / np.sqrt(len(_rs))) if len(_rs) > 1 else 0.0
+                    _results[_name].append((_mu, _se))
+                except Exception as _e:
+                    _errors[_name] = f"{type(_e).__name__}: {_e}"
+                    _results[_name].append((np.nan, np.nan))
+
+        # ---- plot: lines per planner, x = context, y = mean reward ----
+        _fig, _ax = plt.subplots(figsize=(11, 4.6), layout="constrained")
+        _xs = np.asarray(_CONTEXTS)
+        for _name in _planner_names:
+            _vals = _results[_name]
+            if not _vals:
+                continue
+            _mus = np.asarray([v[0] for v in _vals])
+            _ses = np.asarray([v[1] for v in _vals])
+            if np.isnan(_mus).all():
+                continue
+            _color = _palette.get(_name, "gray")
+            _ls = "-" if not _name.startswith("DQN p") else "--"
+            # Shaded ±1 SE band behind the mean line -- visually quieter
+            # than errorbar caps and plays nicer when several lines
+            # overlap. Mean line stays on top via zorder.
+            _ax.fill_between(
+                _xs, _mus - _ses, _mus + _ses,
+                color=_color, alpha=0.15, linewidth=0, zorder=1,
+            )
+            _ax.plot(
+                _xs, _mus, label=_name, color=_color,
+                linestyle=_ls, linewidth=1.8, marker="o", markersize=5,
+                zorder=3,
+            )
+
+        _ax.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
+        _ax.set_xlabel("context  c  =  P[intended]  (slip parameter)")
+        _ax.set_ylabel(f"mean cumulative reward (over {_N} seeds)")
+        _ax.set_xticks(_xs)
+        _ax.set_xticklabels([f"{x:.2f}" for x in _xs])
+        _ax.set_title(
+            "Scenario C · Contextual MDPs  ·  performance across slip contexts  ·  "
+            f"each context: stationary, N={_N} seeds, {_MAX} steps",
+            fontsize=10, fontweight=600,
         )
-        _fig = plot_scenario_panel(
-            _metrics, _errors,
-            "Scenario C · Gallery env (your Module 1 selection)  ·  "
-            "DDQN's latency edge",
-        )
-        _err_md = (
-            "\n\n_Skipped:_  " + "  ·  ".join(
+        _ax.set_ylim(-0.05, 1.05)
+        _ax.grid(alpha=0.25)
+        _ax.legend(fontsize=8, loc="lower right", framealpha=0.92)
+
+        _err_md = ""
+        if _errors:
+            _err_md = "\n\n_Skipped:_  " + "  ·  ".join(
                 f"**{n}** ({why})" for n, why in _errors.items()
-            ) if _errors else ""
+            )
+        _done_md = mo.md(
+            f"✓ Scenario C finished in **{_time.time() - _t0:.1f} s** — "
+            f"{len(_planner_names)} planners × {len(_CONTEXTS)} contexts × "
+            f"{_N} seeds × {_MAX} steps." + _err_md
         )
-        _out = mo.vstack([_fig, mo.md(_err_md)] if _err_md else [_fig])
+        _out = mo.vstack([_fig, _done_md])
     _out
     return
 
@@ -6456,6 +7924,7 @@ def _(mo):
 
 @app.cell
 def _(fl_freeform_editor, fl_freeform_run, gym, mo, np):
+    import time as _time
     if not fl_freeform_run.value:
         _out = mo.md("_Click the button above to execute the code in the active tab._")
     else:
@@ -6473,6 +7942,7 @@ def _(fl_freeform_editor, fl_freeform_run, gym, mo, np):
         _stderr = _io.StringIO()
         _so, _se = _sys.stdout, _sys.stderr
         _sys.stdout, _sys.stderr = _stdout, _stderr
+        _t0 = _time.time()
         try:
             exec(fl_freeform_editor.value, _ns)
             _status = "✓ ran cleanly"
@@ -6480,9 +7950,10 @@ def _(fl_freeform_editor, fl_freeform_run, gym, mo, np):
             _status = f"⚠ {type(_e).__name__}: {_e}"
         finally:
             _sys.stdout, _sys.stderr = _so, _se
+        _elapsed = _time.time() - _t0
 
         _out = mo.vstack([
-            mo.md(f"**{_status}**"),
+            mo.md(f"**{_status}** — finished in **{_elapsed:.2f} s**"),
             mo.md("```\n" + (_stdout.getvalue() or "(no stdout)") + "\n```"),
             *([mo.md(f"⚠ stderr:\n```\n{_stderr.getvalue()}\n```")]
               if _stderr.getvalue() else []),
