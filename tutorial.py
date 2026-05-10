@@ -11,7 +11,7 @@
 
 import marimo
 
-__generated_with = "0.23.4"
+__generated_with = "0.23.5"
 app = marimo.App(width="medium")
 
 
@@ -213,18 +213,14 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Four key questions for decision making in NS-MDPs</div></div>
 
-    Every modeling choice in NS-Gym maps onto one of these four
+    ## Every modeling choice in NS-Gym maps onto one of these four
     questions. Keep them in mind as we go through the rest of the
     tutorial:
 
-    1. **What** changes?  *(which environmental parameter drifts —
-       slip probability, gravity, masspole, …)*
-    2. **How** does it change?  *(the update function — sigmoid, random
-       walk, step, …)*
-    3. Does the agent **detect** the change?  *(is there a notification
-       on every step that the dynamics moved?)*
-    4. Does the agent **know** the change?  *(does the notification
-       carry the new parameter, or just a "something moved" flag?)*
+    ## 1. **What** changes?  *(which environmental parameter drifts —slip probability, gravity, masspole, …)*
+    ## 2. **How** does it change?  *(the update function — sigmoid, random walk, step, …)*
+    ## 3. Does the agent **detect** the change?  *(is there a notificationon every step that the dynamics moved?)*
+    ## 4. Does the agent **know** the change?  *(does the notification carry the new parameter, or just a "something moved" flag?)*
     """)
     return
 
@@ -234,19 +230,14 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">The standard MDP</div></div>
 
-    A Markov Decision Process is the tuple $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$:
+    ## A Markov Decision Process is the tuple $(\mathcal{S}, \mathcal{A}, P, R, \gamma)$:
 
-    - **States** ($\mathcal{S}$) — the agent's "position" in the world.
-    - **Actions** ($\mathcal{A}$) — the choices the agent has at each
-      state. Not all actions are available in all states.
-    - **Transitions** $P(s' \mid s, a, \theta)$ — probability over the
-      next state given the current $(s, a)$ and a parameter
-      $\theta \in \Theta$.
-    - **Rewards** $R(s, a, s')$ — the instantaneous reward the agent
-      receives when it transitions from $s$ to $s'$ via $a$.
+    ## - **States** ($\mathcal{S}$) — the agent's "position" in the world.
+    ## -  **Actions** ($\mathcal{A}$) — the choices the agent has at each state. Not all actions are available in all states.
+    ## - **Transitions** $P(s' \mid s, a, \theta)$ — probability over thenext state given the current $(s, a)$ and a parameter $\theta \in \Theta$.
+    ##- **Rewards** $R(s, a, s')$ — the instantaneous reward the agent receives when it transitions from $s$ to $s'$ via $a$.
 
-    The standard assumption is that **$\theta$ is fixed**: the dynamics
-    today are the dynamics tomorrow.
+    ## The standard assumption is that **$\theta$ is fixed**: the dynamics today are the dynamics tomorrow.
     """)
     return
 
@@ -778,12 +769,36 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #5a3a8a; background: #f3eef7;"><div style="font-size: 2em; font-weight: 700; line-height: 1.2;">Stochastic Grid World Environments</div></div>
 
-    ## While NS-Gym can wrap several more complex environments, for this tutorial will will focus on two varations of discrete state and discrete action space stochastic gridworld environments -- the FrozenLake and the Bridge Environment
+    While NS-Gym can wrap several more complex environments, for this tutorial we will focus on two variations of discrete state and discrete action space stochastic gridworld environments — the **FrozenLake** and the **Bridge** environment.
 
-
-    ## 1.** Interpretability**: Small state and action makes the behavior easier to analyze
-    ##2. **Solvablity**: We can exactly and tratably solve for optimal policies in both satationary and non-sationary cases
+    1. **Interpretability**: Small state and action spaces make the behavior easier to analyze.
+    2. **Solvability**: We can exactly and tractably solve for optimal policies in both stationary and non-stationary cases.
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.hstack(
+        [
+            mo.md(r"""
+            **Environment Formalization**
+
+            **States:** Agent $(x, y)$ position.
+
+            **Actions:** Cardinal movement (N, S, E, W).
+
+            **Transitions:** Probabilistic movement based on $P$ chance
+            to move as intended; $1 - P$ chance to move perpendicularly.
+
+            **Rewards:** $+1$ at goal state; $0$ otherwise.
+            """),
+            mo.image("assets/frozenlake_nonstationary.gif", width=320),
+        ],
+        justify="center",
+        align="center",
+        gap=2,
+    )
     return
 
 
@@ -1469,48 +1484,14 @@ def _(mo):
     (time-augmented backward induction with full schedule foresight).
 
     Both the side-by-side heatmap and the per-episode return plot
-    update reactively whenever you change a dropdown — no code, no
-    re-runs. Try a quiet schedule with a violent drift, a periodic
-    schedule with a slow drift, etc.
+    update reactively whenever you change a dropdown.
 
-    > **★ Heatmap mode matters.** The default **V\\***  panels show each
-    > planner's *self-evaluated* value: stale and myopic both solve
-    > infinite-horizon stationary VI on a snapshotted `P`, while oracle
-    > does finite-horizon backward induction on the full schedule. Those
-    > are **different objectives on different horizons** — the values
-    > are not directly comparable across panels. Switch the
-    > **heatmap mode** dropdown to:
-    >
     > - **V^π under truth** — backward-pass policy evaluation of each
     >   planner's policy on the *true* non-stationary tensor (no max,
-    >   just plug in π). All three are then expected return under the
-    >   same dynamics over the same horizon — apples-to-apples, and
-    >   the panel-to-panel gap is exactly the policy-quality gap that
-    >   the bar plot below measures.
+    >   just plug in π).
     > - **Action gap** — `max_a Q*(s,a,t) − second_max_a Q*`. Where
     >   the gap is large the optimal action is decisive (picking
-    >   wrong costs a lot); where it's small, multiple actions are
-    >   roughly tied. Invariant to horizon scaling. The colormap is
-    >   shared across all three panels (it's the *same* gap field);
-    >   the arrows on each panel are that planner's policy, so you
-    >   can spot disagreements on cells where the gap actually matters.
-
-    > **★ Recipe for visible oracle ≠ myopic divergence:**
-    > pick **`ContinuousScheduler`** + **`★ SigmoidEarlyCliff(t0=4, k=1.0)`**.
-    > The slip probability collapses around step 4, well within the
-    > 6-step goal distance. Oracle, knowing this in advance, picks a
-    > path that's *both fast and robust* against the impending cliff.
-    > Myopic at `t=0` only sees a deterministic env and plans the
-    > naïve shortest path; its policy diverges from the oracle's
-    > visibly at upper-left tiles, and its mean episode return is
-    > markedly worse on the bar plot below.
-    >
-    > Other combos to try:
-    > **`PeriodicScheduler(period=5)`** + **`DistributionStepWiseUpdate`**
-    > (lurching dynamics — oracle times its moves to the silent
-    > intervals); **`MemorylessScheduler(p=0.2)`** +
-    > **`★ DistributionDecrementUpdate(k=0.15)`** (stochastic onset
-    > with sharp decay — oracle hedges, myopic gambles).
+    >   wrong costs a lot);
     """)
     return
 
@@ -1795,14 +1776,12 @@ def _(mo):
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #555; background: #f6f6f6;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Performance — stale vs replan vs oracle on your env</div></div>
 
     **100 episodes** per planner, same drift schedule, fresh RNGs per
-    episode. Bar plots compress out the distribution and a μ-difference
-    smaller than ~2·SE on FrozenLake's binary reward (≈ 0.10 at N=100)
-    is just noise. We show two views instead:
+    episode.
 
-    - **Left — return distribution per planner.** Violin shape carries
-      the median, IQR and the long tail of zeros. The dot marks the
-      mean; the annotation gives success rate over all seeds.
-    - **Right — paired difference.** For each seed, *(oracle − stale)*
+    - **Left — return distribution per planner.**
+    - Violin shape carries the median, IQR and the long tail of zeros. The dot marks the mean; the annotation gives success rate over all seeds.
+    - **Right — paired difference.**
+    - For each seed, *(oracle − stale)*
       and *(oracle − replan)*. Dots above 0 mean oracle wins on that
       seed; dots below 0 are the surprising losses you noticed. The
       vertical band is the mean ± SE of the per-seed difference — a
@@ -1966,9 +1945,7 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #1a1a1a; background: #efefef;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">Your turn — custom scheduler</div></div>
 
-    Subclass `nsg_base.Scheduler` so the env updates *stochastically* with
-    probability 0.25 per step. Implement `_check(t) -> bool`. The
-    "Reference solution" tab below holds the worked answer.
+    Subclass `nsg_base.Scheduler` and implement your own scheduler. Implement `_check(t) -> bool`. Where it returns true at time
     """)
     return
 
@@ -1988,11 +1965,11 @@ def _(mo):
     _solution = """class FLUserScheduler(nsg_base.Scheduler):
     \"\"\"Reference: Bernoulli(0.25) firing pattern.\"\"\"
     def __init__(self):
-        super().__init__()
-        self.rng = np.random.default_rng(0)
-
-    def _check(self, t):
-        return bool(self.rng.random() < 0.25)
+            super().__init__()
+            self.rng = np.random.default_rng(0)
+    
+        def _check(self, t):
+            return bool(self.rng.random() < 0.25)
     """
     fl_scheduler_editor = mo.ui.code_editor(
         value=_stub, language="python", min_height=10,
@@ -2041,11 +2018,7 @@ def _(mo):
     <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #1a1a1a; background: #efefef;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">Your turn — custom update function</div></div>
 
     Schedulers say *when* the world changes. Update functions say *how*.
-    Subclass `nsg_base.UpdateDistributionFn` and write a **linear ramp**
-    on `P[\text{intended}]` — the slip distribution should start at
-    $[1, 0, 0]$ and linearly decay to $[0, 0.5, 0.5]$ over `T` steps.
-    Reference solution lives in the second tab.
-
+    Subclass `nsg_base.UpdateDistributionFn` write your own version of the
     The verification cell below builds a FrozenLake env using your
     update function, rolls 30 steps under a random policy, and plots
     `P[intended]` over time. If your ramp is correct you should see a
@@ -2549,7 +2522,7 @@ def _(
         )
         bridge_myopic_V[_t] = _v
         bridge_myopic_policy[_t] = _pi
-    return bridge_myopic_V, bridge_myopic_policy
+    return (bridge_myopic_policy,)
 
 
 @app.cell
@@ -2600,11 +2573,10 @@ def _(fl_oracle_horizon, mo):
     )
     bridge_view = mo.ui.dropdown(
         options=[
-            "V*  —  each planner's self-eval (different horizons, NOT comparable)",
             "V^π  —  policy evaluated under truth (apples-to-apples)",
             "Action gap  —  max Q* − second-best Q* (oracle, shared scale)",
         ],
-        value="V*  —  each planner's self-eval (different horizons, NOT comparable)",
+        value="V^π  —  policy evaluated under truth (apples-to-apples)",
         label="heatmap mode",
     )
     mo.hstack([bridge_t, bridge_view], justify="start", gap=2)
@@ -2688,15 +2660,12 @@ def _(
     FL_ACTION_LEGEND,
     bridge_draw_policy_panel,
     bridge_draw_value_panel,
-    bridge_myopic_V,
     bridge_myopic_Vpi,
     bridge_myopic_policy,
-    bridge_oracle_V,
     bridge_oracle_Vpi,
     bridge_oracle_gap,
     bridge_oracle_policy,
     bridge_stale_Vpi,
-    bridge_stationary_V,
     bridge_stationary_policy,
     bridge_t,
     bridge_view,
@@ -2707,7 +2676,17 @@ def _(
     _t = bridge_t.value
     _mode = bridge_view.value
 
-    if _mode.startswith("V^π"):
+    if _mode.startswith("Action gap"):
+        _gap = bridge_oracle_gap[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
+        _grid_stale = _gap
+        _grid_myopic = _gap
+        _grid_oracle = _gap
+        _vmax = max(float(bridge_oracle_gap.max()), 1e-3)
+        _row_label = f"Action gap (oracle Q*) at t={_t}"
+        _t_stale_v = f"Stale  arrows on gap (t={_t})"
+        _t_myopic_v = f"Myopic  arrows on gap (t={_t})"
+        _t_oracle_v = f"Oracle  arrows on gap (t={_t})"
+    else:
         _grid_stale = bridge_stale_Vpi[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
         _grid_myopic = bridge_myopic_Vpi[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
         _grid_oracle = bridge_oracle_Vpi[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
@@ -2721,30 +2700,6 @@ def _(
         _t_stale_v = f"Stale  V^π(s, t={_t})"
         _t_myopic_v = f"Myopic replan  V^π(s, t={_t})"
         _t_oracle_v = f"Oracle  V^π(s, t={_t})"
-    elif _mode.startswith("Action gap"):
-        _gap = bridge_oracle_gap[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
-        _grid_stale = _gap
-        _grid_myopic = _gap
-        _grid_oracle = _gap
-        _vmax = max(float(bridge_oracle_gap.max()), 1e-3)
-        _row_label = f"Action gap (oracle Q*) at t={_t}"
-        _t_stale_v = f"Stale  arrows on gap (t={_t})"
-        _t_myopic_v = f"Myopic  arrows on gap (t={_t})"
-        _t_oracle_v = f"Oracle  arrows on gap (t={_t})"
-    else:
-        _grid_stale = bridge_stationary_V.reshape(BRIDGE_NROW, BRIDGE_NCOL)
-        _grid_myopic = bridge_myopic_V[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
-        _grid_oracle = bridge_oracle_V[_t].reshape(BRIDGE_NROW, BRIDGE_NCOL)
-        _vmax = max(
-            float(bridge_stationary_V.max()),
-            float(bridge_oracle_V[0].max()),
-            float(bridge_myopic_V[0].max()),
-            1e-3,
-        )
-        _row_label = "V*(s,t)  (different horizons — NOT comparable)"
-        _t_stale_v = "Stale VI   (no updates)"
-        _t_myopic_v = f"Myopic replan   V(s, t={_t})"
-        _t_oracle_v = f"Oracle VI   V(s, t={_t})"
 
     _fig, _axes = plt.subplots(
         2, 3, figsize=(16, 7),
@@ -2812,11 +2767,20 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #555; background: #f6f6f6;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Performance — stale vs replan vs oracle on Bridge</div></div>
 
-    30 episodes per planner, same drift schedule, fresh RNGs per
+    **100 episodes** per planner, same drift schedule, fresh RNGs per
     episode. With the default recipe (`ContinuousScheduler` +
     `★ SigmoidEarlyCliff`), the right-bridge corridor that's optimal
     under deterministic dynamics becomes a death trap halfway through —
-    and that's exactly where stale-VI is committed. Watch the gap.
+    and that's exactly where stale-VI is committed. We show two views:
+
+    - **Left — return distribution per planner.** Violin shape carries
+      the median, IQR, and the long tail of −1 hole-falls. The dot
+      marks the mean ± SE; the annotation gives the goal-success rate.
+    - **Right — paired difference.** For each seed, *(oracle − stale)*
+      and *(oracle − replan)*. Dots above 0 mean oracle wins on that
+      seed; dots below 0 are the surprising losses. The black diamond
+      is the mean ± SE of the per-seed difference — a paired test of
+      "does foresight buy something here?"
 
     > **Variance note.** `Bridge.step()` samples slips from the *global*
     > numpy RNG, not the env-seeded one, so two rollouts with the same
@@ -2884,7 +2848,8 @@ def _(
             t += 1
         return ep_return
 
-    _seeds = list(range(30))
+    _N_SEEDS = 100
+    _seeds = list(range(_N_SEEDS))
     _stale, _replan, _oracle = [], [], []
     for _s in _seeds:
         np.random.seed(_s)
@@ -2893,30 +2858,97 @@ def _(
         _replan.append(_bridge_replan_rollout(bridge_make_env(), bridge_stationary_policy, seed=_s))
         np.random.seed(_s)
         _oracle.append(_bridge_oracle_rollout(bridge_make_env(), bridge_oracle_policy, seed=_s))
+    _stale_a = np.asarray(_stale, dtype=float)
+    _replan_a = np.asarray(_replan, dtype=float)
+    _oracle_a = np.asarray(_oracle, dtype=float)
 
-    _fig, _ax = plt.subplots(figsize=(8, 3.4))
-    _w = 0.27
-    _idx = np.arange(len(_seeds))
-    _ax.bar(_idx - _w, _stale, _w, color="tab:red",
-            label=f"stale-VI  (μ={np.mean(_stale):.2f})")
-    _ax.bar(_idx, _replan, _w, color="tab:blue",
-            label=f"replan-VI  (μ={np.mean(_replan):.2f})")
-    _ax.bar(_idx + _w, _oracle, _w, color="tab:green",
-            label=f"oracle-VI  (μ={np.mean(_oracle):.2f})")
-    for _vals, _color in [(_stale, "tab:red"),
-                          (_replan, "tab:blue"),
-                          (_oracle, "tab:green")]:
-        _ax.axhline(np.mean(_vals), color=_color, linestyle="--", alpha=0.4)
-    _ax.set_xlabel("episode seed")
-    _ax.set_ylabel("return  (-1 hole, +1 goal)")
-    _ax.set_ylim(-1.1, 1.1)
+    _fig, (_ax_v, _ax_d) = plt.subplots(
+        1, 2, figsize=(11.5, 3.8), layout="constrained",
+    )
+
+    # --- Left: violin plot of return distributions ----------------
+    _data = [_stale_a, _replan_a, _oracle_a]
+    _names = ["stale-VI", "replan-VI", "oracle-VI"]
+    _colors = ["tab:red", "tab:blue", "tab:green"]
+    _vp = _ax_v.violinplot(
+        _data, positions=[0, 1, 2], showmeans=False,
+        showmedians=False, showextrema=False, widths=0.75,
+    )
+    for _body, _col in zip(_vp["bodies"], _colors):
+        _body.set_facecolor(_col)
+        _body.set_edgecolor("black")
+        _body.set_alpha(0.55)
+        _body.set_linewidth(0.6)
+    for _i, (_arr, _col) in enumerate(zip(_data, _colors)):
+        _mu = float(np.mean(_arr))
+        _se = float(np.std(_arr, ddof=1) / np.sqrt(len(_arr)))
+        _ax_v.errorbar(
+            _i, _mu, yerr=_se, fmt="o", color="white",
+            markerfacecolor=_col, markeredgecolor="black",
+            markersize=8, capsize=4, zorder=5,
+        )
+        _succ = int(np.sum(_arr > 0))
+        _ax_v.text(
+            _i, 1.18,
+            f"μ={_mu:+.2f}±{_se:.02f}\n{_succ}/{_N_SEEDS} succ",
+            ha="center", va="bottom", fontsize=8,
+        )
+    _ax_v.set_xticks([0, 1, 2])
+    _ax_v.set_xticklabels(_names, fontsize=9)
+    _ax_v.set_ylabel("return  (−1 hole, +1 goal)")
+    _ax_v.set_ylim(-1.3, 1.6)
+    _ax_v.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
+    _ax_v.axhline(1, color="grey", linewidth=0.5, alpha=0.4)
+    _ax_v.axhline(-1, color="grey", linewidth=0.5, alpha=0.4)
+    _ax_v.set_title(
+        f"Return distribution  (violins, N={_N_SEEDS})", fontsize=10,
+    )
+
+    # --- Right: paired-diff strip plot ---------------------------
+    _diff_oracle_stale = _oracle_a - _stale_a
+    _diff_oracle_replan = _oracle_a - _replan_a
+    _diffs = [_diff_oracle_stale, _diff_oracle_replan]
+    _diff_names = ["oracle − stale", "oracle − replan"]
+    _diff_colors = ["tab:red", "tab:blue"]  # color of the *baseline*
+    _rng = np.random.default_rng(0)
+    for _i, (_d, _col) in enumerate(zip(_diffs, _diff_colors)):
+        _xs = _i + (_rng.uniform(-0.16, 0.16, size=len(_d)))
+        _ax_d.scatter(
+            _xs, _d, s=18, alpha=0.55, color=_col,
+            edgecolor="black", linewidth=0.3,
+        )
+        _mu = float(np.mean(_d))
+        _se = float(np.std(_d, ddof=1) / np.sqrt(len(_d)))
+        _wins = int(np.sum(_d > 0))
+        _losses = int(np.sum(_d < 0))
+        _ax_d.errorbar(
+            _i, _mu, yerr=_se, fmt="D", color="white",
+            markerfacecolor="black", markeredgecolor="black",
+            markersize=7, capsize=5, zorder=5,
+        )
+        _ax_d.text(
+            _i, 2.3,
+            f"μ_diff={_mu:+.2f}±{_se:.02f}\n"
+            f"oracle wins {_wins}/{_N_SEEDS}  ·  "
+            f"loses {_losses}/{_N_SEEDS}",
+            ha="center", va="bottom", fontsize=8,
+        )
+    _ax_d.axhline(0, color="grey", linewidth=0.8)
+    _ax_d.set_xticks([0, 1])
+    _ax_d.set_xticklabels(_diff_names, fontsize=9)
+    _ax_d.set_ylabel("per-seed return diff")
+    _ax_d.set_ylim(-2.5, 2.7)
+    _ax_d.set_title(
+        "Paired difference per seed  (above 0 → oracle wins)",
+        fontsize=10,
+    )
+
     _short_sched = fl_sched_pick.value.split(" — ")[0].split("(")[0].strip()
     _short_drift = fl_drift_pick.value.split(" — ")[0].split("(")[0].strip()
-    _ax.set_title(
-        f"BRIDGE  •  {_short_sched}  ×  {_short_drift}"
+    _fig.suptitle(
+        f"BRIDGE  •  {_short_sched}  ×  {_short_drift}  •  N={_N_SEEDS}",
+        fontsize=10,
     )
-    _ax.legend(fontsize=8, loc="upper right")
-    _fig.tight_layout()
     _fig
     return
 
@@ -3819,6 +3851,190 @@ def _(np, type_mismatch_checker, value_iteration):
 
 @app.cell(hide_code=True)
 def _(mo):
+    mo.md(r"""
+    <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #1a1a1a; background: #efefef;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">Why stationary algorithms break — at the action level</div></div>
+
+    A success-rate plot tells you *how often* the policy fails. The
+    Q-gap plots tell you *how much value it leaves on the table*. To
+    see *why* it fails — and what's so special about non-stationary
+    problems — look at where the policy and the time-indexed oracle
+    **disagree on the action** each step.
+
+    **Left: action-disagreement over time.** At step $t$, what fraction
+    of seeds chose an action the oracle would *not* have chosen at the
+    agent's current state? Stale-VI is solving against $P_0$ forever,
+    so as the env drifts the disagreement **grows monotonically**.
+    Replan-VI re-solves on every notification and stays low. Oracle is
+    zero by construction (it *is* the reference). The slope of the
+    stale curve is the visual signature of "the policy went stale."
+
+    **Right: empirical CDF of cumulative returns.** $\hat F(x) =
+    \mathbb P[\,\text{return} \le x\,]$ over $N$ seeds. A sparse-reward
+    FrozenLake return is 0 (failed) or 1 (reached goal), so each curve
+    is a step function with the height at $x = 0$ equal to the
+    **failure rate**. **What the eCDF tells you that a mean doesn't:**
+
+    - **Distribution shape.** Two methods can have the same mean
+      $\bar R$ via very different shapes: one wins big sometimes and
+      dies often (bimodal), another scores small reliably. A bar
+      chart hides this; the eCDF makes the failure mode literal.
+    - **Risk profile.** A method whose curve rises steeply on the
+      left (lots of mass near 0) is *unreliable* in a way that
+      averaging suppresses.
+    - **Stochastic dominance.** If method A's eCDF lies entirely
+      to the right of method B's, A *first-order stochastically
+      dominates* B — for any threshold $x$, A is at least as
+      likely to clear it as B.
+
+    > This is the gap that NS-MDP-specific algorithms close: re-planning,
+    > worst-case planning, or context-conditioned policies all aim to
+    > keep the disagreement curve low so the eCDF of returns sits as
+    > far right as possible — even when the env drifts.
+    """)
+    return
+
+
+@app.cell
+def _(
+    fl_adapt_k,
+    fl_make_env,
+    fl_oracle_horizon,
+    fl_oracle_policy,
+    fl_vi_policy,
+    np,
+    plt,
+    type_mismatch_checker,
+    value_iteration,
+):
+    _N_SEEDS = 50
+    _T_MAX = int(fl_oracle_horizon)
+    _k = float(fl_adapt_k.value)
+
+    def _oracle_action(t, state):
+        _T = fl_oracle_policy.shape[0]
+        return int(fl_oracle_policy[min(t, _T - 1), int(state)])
+
+    # fl_vi_policy is a callable (state -> action) elsewhere in this notebook;
+    # capture its t=0 actions as a 16-vector once so we can subscript it for
+    # both stale and the replan-warm-start.
+    _stale_pi_arr = np.asarray(
+        [int(fl_vi_policy(_s)) for _s in range(16)],
+        dtype=np.int64,
+    )
+
+    def _stale_factory():
+        # No state, no post-step hook
+        return (lambda s, t, env: int(_stale_pi_arr[int(s)]), None)
+
+    def _oracle_factory():
+        return (lambda s, t, env: _oracle_action(t, int(s)), None)
+
+    def _replan_factory():
+        # Mutable policy; refit when env_change notification fires.
+        _state = {"policy": _stale_pi_arr.copy()}
+        def _picker(s, t, env):
+            return int(_state["policy"][int(s)])
+        def _after_step(obs, env):
+            if isinstance(obs, dict) and obs.get("env_change", {}).get("P", 0):
+                _new_policy, _ = value_iteration(env.get_planning_env())
+                _state["policy"] = np.asarray(_new_policy).reshape(-1).astype(np.int64)
+        return (_picker, _after_step)
+
+    def _rollout(picker_factory, n_seeds):
+        _sum_disagree = np.zeros(_T_MAX, dtype=np.float64)
+        _count = np.zeros(_T_MAX, dtype=np.float64)
+        _final_r = np.zeros(n_seeds, dtype=np.float64)
+        for _s in range(n_seeds):
+            _picker, _after_step = picker_factory()
+            _env = fl_make_env(_k)
+            _obs, _ = _env.reset(seed=_s)
+            _state, _ = type_mismatch_checker(_obs)
+            _done = _trunc = False
+            _t = 0
+            while not (_done or _trunc) and _t < _T_MAX:
+                _a_taken = int(_picker(int(_state), _t, _env))
+                _a_oracle = _oracle_action(_t, int(_state))
+                _sum_disagree[_t] += 1.0 if (_a_taken != _a_oracle) else 0.0
+                _count[_t] += 1.0
+                _obs, _reward, _done, _trunc, _ = _env.step(_a_taken)
+                if _after_step is not None:
+                    _after_step(_obs, _env)
+                _state, _reward = type_mismatch_checker(_obs, _reward)
+                _final_r[_s] += float(_reward)
+                _t += 1
+        with np.errstate(invalid="ignore"):
+            _disagreement = _sum_disagree / np.maximum(_count, 1)
+        return _disagreement, _count, _final_r
+
+    _planners = [
+        ("stale-VI",  "tab:red",   _stale_factory),
+        ("replan-VI", "tab:blue",  _replan_factory),
+        ("oracle-VI", "tab:green", _oracle_factory),
+    ]
+
+    _data = {}
+    for _name, _color, _fac in _planners:
+        _disagree, _count, _returns = _rollout(_fac, _N_SEEDS)
+        _data[_name] = {
+            "disagree": _disagree, "count": _count,
+            "returns": _returns, "color": _color,
+        }
+
+    _fig, (_ax_d, _ax_c) = plt.subplots(
+        1, 2, figsize=(12.5, 4.4), layout="constrained",
+    )
+
+    # ----- LEFT: disagreement-over-time -----
+    for _name, _color, _ in _planners:
+        _info = _data[_name]
+        _mask = _info["count"] > 0
+        _xs = np.arange(_T_MAX)[_mask]
+        _ax_d.plot(_xs, _info["disagree"][_mask], label=_name, color=_color,
+                   linewidth=1.8, marker="o", markersize=3)
+    _ax_d.set_xlabel("step")
+    _ax_d.set_ylabel(r"$\Pr(a_\mathrm{taken} \neq a^*_t)$  given the agent reached step $t$")
+    _ax_d.set_ylim(-0.02, 1.02)
+    _ax_d.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
+    _ax_d.set_title(
+        f"Action disagreement vs time-indexed oracle  "
+        f"(k={_k:.2f}, N={_N_SEEDS} seeds)",
+        fontsize=10,
+    )
+    _ax_d.legend(fontsize=8, loc="lower right")
+    _ax_d.grid(alpha=0.25)
+
+    # ----- RIGHT: empirical CDF -----
+    for _name, _color, _ in _planners:
+        _info = _data[_name]
+        _rs = np.sort(_info["returns"])
+        _ys = np.arange(1, len(_rs) + 1) / len(_rs)
+        # Pad with a (min - eps, 0) point so the step starts cleanly at 0.
+        _xs_aug = np.concatenate([[float(_rs.min()) - 0.05], _rs])
+        _ys_aug = np.concatenate([[0.0], _ys])
+        _ax_c.step(_xs_aug, _ys_aug, where="post", label=_name, color=_color,
+                   linewidth=1.8)
+    _ax_c.set_xlabel("cumulative return per episode")
+    _ax_c.set_ylabel(r"$\hat F(x) = \Pr(\mathrm{return} \leq x)$")
+    _ax_c.set_ylim(-0.02, 1.02)
+    _ax_c.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
+    _ax_c.axhline(1, color="grey", linewidth=0.5, alpha=0.4)
+    _ax_c.set_title(
+        f"Empirical CDF of returns  (k={_k:.2f}, N={_N_SEEDS} seeds)",
+        fontsize=10,
+    )
+    _ax_c.legend(fontsize=8, loc="lower right")
+    _ax_c.grid(alpha=0.25)
+
+    _fig.suptitle(
+        "Why stationary algorithms break — action-level + outcome-shape evidence",
+        fontsize=11, fontweight=600,
+    )
+    _fig
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
     mo.Html("""
     <div style="
         margin: 5em 0 1.5em 0;
@@ -3858,7 +4074,7 @@ def _(mo):
     - **Re-plan VI** — Section 3's notification-driven re-planner
       (`fl_replan_sweep["returns_by_k_adaptive"]`).
     - **Oracle VI** — Section 3's time-augmented JIT planner with
-      perfect foresight on the drift schedule (`fl_oracle_sweep`).
+      perfect foresight on the drift schedule (run inline below).
 
     Run the sweep buttons above; this section populates live as each
     one finishes.
@@ -3867,7 +4083,7 @@ def _(mo):
 
 
 @app.cell
-def _(fl_oracle_sweep, fl_replan_sweep, fl_sweep, fl_vi_sweep):
+def _(fl_replan_sweep, fl_sweep, fl_vi_sweep):
     eval_runs = {}
     if fl_sweep is not None:
         eval_runs["random"] = fl_sweep["returns_by_k"]
@@ -3875,14 +4091,12 @@ def _(fl_oracle_sweep, fl_replan_sweep, fl_sweep, fl_vi_sweep):
         eval_runs["stale-VI"] = fl_vi_sweep["returns_by_k"]
     if fl_replan_sweep is not None:
         eval_runs["replan-VI"] = fl_replan_sweep["returns_by_k_adaptive"]
-    if fl_oracle_sweep is not None:
-        eval_runs["oracle-VI"] = fl_oracle_sweep["returns_by_k"]
     eval_missing = [
         label for label, dataset in [
             ("random (Section 1)", fl_sweep),
             ("stale-VI (Section 2)", fl_vi_sweep),
             ("replan-VI (Section 3)", fl_replan_sweep),
-            ("oracle-VI (Section 3)", fl_oracle_sweep),
+            ("oracle-VI (inline)", None),
         ] if dataset is None
     ]
     return eval_missing, eval_runs
@@ -3939,7 +4153,7 @@ def _(
             "random (Section 1)": "random",
             "stale-VI (Section 2)": "stale-VI",
             "replan-VI (Section 3)": "replan-VI",
-            "oracle-VI (Section 3)": "oracle-VI",
+            "oracle-VI (inline)": "oracle-VI",
         }
         # If everything is already present, the button means "re-run all".
         if eval_missing:
@@ -4588,128 +4802,6 @@ def _(
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""
-    <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #1a1a1a; background: #efefef;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">Your turn — threshold-triggered re-planner</div></div>
-
-    Re-planning every step is expensive. Implement a triggered version
-    that only re-plans when `obs["delta_change"]["P"]` exceeds a
-    threshold. Slide the threshold to find a value that keeps the return
-    close to the every-step replanner while cutting the re-plan count.
-    """)
-    return
-
-
-@app.cell
-def _(mo):
-    fl_threshold = mo.ui.slider(
-        start=0.0, stop=0.5, step=0.01, value=0.05,
-        label="re-plan threshold (delta_change)",
-    )
-    fl_threshold
-    return (fl_threshold,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    _stub = '''def fl_threshold_rollout(env, initial_policy, threshold, seed=0):
-    """Replan only when delta_change[P] exceeds `threshold`.
-
-    Hint 1: read float(obs["delta_change"]["P"]) per step.
-    Hint 2: when you replan, plan against env.get_planning_env()
-            — the canonical notification-level-3 snapshot.
-    """
-    # TODO: implement the trigger + replan logic.
-    return 0.0, 0
-    '''
-    _solution = '''def fl_threshold_rollout(env, initial_policy, threshold, seed=0):
-    """Reference: only run VI when |delta_change[P]| > threshold."""
-    policy = np.asarray(initial_policy).copy()
-    obs, _ = env.reset(seed=seed)
-    state, _ = type_mismatch_checker(obs)
-    done = trunc = False
-    ep_return = 0.0
-    replans = 0
-    while not (done or trunc):
-        action = int(policy[state])
-        obs, reward, done, trunc, _ = env.step(action)
-        _delta = (
-            float(obs.get("delta_change", {}).get("P", 0.0))
-            if isinstance(obs, dict) else 0.0
-        )
-        if _delta > threshold:
-            planning_env = env.get_planning_env()
-            policy, _ = value_iteration(planning_env)
-            replans += 1
-        state, reward = type_mismatch_checker(obs, reward)
-        ep_return += reward
-    return ep_return, replans
-    '''
-    fl_threshold_editor = mo.ui.code_editor(
-        value=_stub, language="python", min_height=14,
-    )
-    _ref = mo.ui.code_editor(
-        value=_solution, language="python", disabled=True, min_height=14,
-    )
-    mo.ui.tabs({
-        "✏️ Your code": fl_threshold_editor,
-        "💡 Reference solution": _ref,
-    })
-    return (fl_threshold_editor,)
-
-
-@app.cell
-def _(fl_threshold_editor, np, type_mismatch_checker, value_iteration):
-    _ns = {
-        "np": np,
-        "type_mismatch_checker": type_mismatch_checker,
-        "value_iteration": value_iteration,
-    }
-    try:
-        exec(fl_threshold_editor.value, _ns)
-        fl_threshold_rollout = _ns.get("fl_threshold_rollout")
-        if fl_threshold_rollout is None:
-            raise NameError("define a function named fl_threshold_rollout")
-        _msg = "✓ fl_threshold_rollout compiled"
-    except Exception as _e:
-        fl_threshold_rollout = None
-        _msg = f"⚠ {type(_e).__name__}: {_e}"
-    _msg
-    return (fl_threshold_rollout,)
-
-
-@app.cell
-def _(
-    fl_adapt_k,
-    fl_make_env,
-    fl_stationary_policy,
-    fl_threshold,
-    fl_threshold_rollout,
-    np,
-):
-    if fl_threshold_rollout is None:
-        _out = "⚠ Fix the function above to see threshold-replanner results."
-    else:
-        _seeds = list(range(30))
-        _returns = []
-        _replans = []
-        for _s in _seeds:
-            _env = fl_make_env(fl_adapt_k.value)
-            _ret, _rc = fl_threshold_rollout(
-                _env, fl_stationary_policy, fl_threshold.value, seed=_s,
-            )
-            _returns.append(_ret)
-            _replans.append(_rc)
-        _out = (
-            f"At k={fl_adapt_k.value:.2f}, threshold={fl_threshold.value:.2f}: "
-            f"mean return = {np.mean(_returns):.2f}, "
-            f"mean re-plans = {np.mean(_replans):.1f}"
-        )
-    _out
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
     fl_replan_run_sweep = mo.ui.run_button(label="Run stale vs re-plan sweep")
     mo.vstack([
         mo.md(r"""
@@ -4784,30 +4876,6 @@ def _(
         )
     _status
     return (fl_replan_sweep,)
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #5a3a8a; background: #f3eef7;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">Oracle VI — perfect foresight on the drift schedule</div></div>
-
-    Stale-VI assumes the world never changes. Replan-VI reacts to change
-    notifications. The *oracle* knows the entire transition trajectory
-    `P_0, P_1, …, P_{T-1}` ahead of time and solves the time-augmented
-    Bellman equation
-
-    $$V(s, t) = \max_a \sum_{s'} P_t(s' \mid s, a)\,
-       \bigl[R_t(s, a, s') + \gamma\, V(s', t+1)\bigr]$$
-
-    with terminal `V(s, T) = 0`. The optimal policy is also time-indexed:
-    $\pi^*(s, t) = \arg\max_a \, Q(s, a, t)$.
-
-    This is the upper bound any reactive agent can target — *it cheats*
-    by reading the future. We numba-JIT the backward sweep over
-    `(T, S, A, S)` so it runs in milliseconds even though the state
-    space is augmented with time.
-    """)
-    return
 
 
 @app.cell
@@ -4904,37 +4972,6 @@ def _(build_ns_tensors, fl_adapt_k, fl_make_env, ns_oracle_vi):
         fl_oracle_horizon,
         fl_oracle_policy,
     )
-
-
-@app.cell(hide_code=True)
-def _(fl_oracle_horizon, mo):
-    fl_oracle_t = mo.ui.slider(
-        start=0, stop=fl_oracle_horizon - 1, step=1, value=0,
-        label="oracle time t",
-    )
-    mo.vstack([
-        mo.md(r"""
-        <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #555; background: #f6f6f6;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Heatmaps — stale vs myopic-replan vs oracle, side by side</div></div>
-
-        Three ways an agent can value states under non-stationarity:
-
-        - **Stale VI** (left) — solved once on the deterministic
-        (`is_slippery=False`) env. The value function never updates;
-        constant across `t`.
-        - **Myopic replan VI** (middle) — at each step `t`, re-solve
-        stationary VI on the current `P_t`. No notifications, no
-        foresight; assumes `P_t` holds forever.
-        - **Oracle VI** (right) — backward induction over the
-        time-augmented MDP. Knows `P_0, P_1, …, P_{T-1}` ahead of time.
-
-        All three panels share a color scale and live in one figure. Slide
-        `t` to scrub. Stale stays put; myopic shifts as `P_t` shifts; oracle
-        is *lower* on the upper-left at small `t` because it discounts the
-        riskier future.
-        """),
-        fl_oracle_t,
-    ])
-    return (fl_oracle_t,)
 
 
 @app.cell
@@ -5084,21 +5121,6 @@ def _(np):
 
 
 @app.cell
-def _(fl_oracle_P, fl_oracle_R, fl_oracle_gamma, np, stationary_vi_jit):
-    _T = fl_oracle_P.shape[0]
-    _S = fl_oracle_P.shape[1]
-    fl_myopic_V_traj = np.zeros((_T, _S))
-    fl_myopic_policy_traj = np.zeros((_T, _S), dtype=np.int64)
-    for _t in range(_T):
-        _v, _pi = stationary_vi_jit(
-            fl_oracle_P[_t], fl_oracle_R[_t], fl_oracle_gamma,
-        )
-        fl_myopic_V_traj[_t] = _v
-        fl_myopic_policy_traj[_t] = _pi
-    return fl_myopic_V_traj, fl_myopic_policy_traj
-
-
-@app.cell
 def _(FL_ACTION_ARROWS, FL_MAP):
     def fl_draw_value_panel(ax, V_grid, policy_grid, title, vmax):
         """Render a 4x4 V/policy heatmap with hole/goal/arrow annotations."""
@@ -5177,255 +5199,6 @@ def _(FL_ACTION_ARROWS, FL_MAP, np):
 
 
 @app.cell
-def _(
-    FL_ACTION_LEGEND,
-    fl_adapt_k,
-    fl_draw_policy_panel,
-    fl_draw_value_panel,
-    fl_myopic_V_traj,
-    fl_myopic_policy_traj,
-    fl_oracle_V,
-    fl_oracle_policy,
-    fl_oracle_t,
-    fl_stationary_V,
-    fl_stationary_policy,
-    plt,
-):
-    _t = fl_oracle_t.value
-    _vmax = max(
-        float(fl_stationary_V.max()),
-        float(fl_oracle_V[0].max()),
-        float(fl_myopic_V_traj[0].max()),
-        1e-3,
-    )
-
-    _fig, _axes = plt.subplots(2, 3, figsize=(13.5, 8.6), layout="constrained")
-    # Top row — V(s, t) heatmaps with arrows
-    fl_draw_value_panel(
-        _axes[0, 0],
-        fl_stationary_V.reshape(4, 4),
-        fl_stationary_policy.reshape(4, 4),
-        "Stale VI   (no updates)",
-        vmax=_vmax,
-    )
-    fl_draw_value_panel(
-        _axes[0, 1],
-        fl_myopic_V_traj[_t].reshape(4, 4),
-        fl_myopic_policy_traj[_t].reshape(4, 4),
-        f"Myopic replan   V(s, t={_t})",
-        vmax=_vmax,
-    )
-    _im_v = fl_draw_value_panel(
-        _axes[0, 2],
-        fl_oracle_V[_t].reshape(4, 4),
-        fl_oracle_policy[_t].reshape(4, 4),
-        f"Oracle VI   V(s, t={_t})",
-        vmax=_vmax,
-    )
-    # Bottom row — color-coded π(s, t)
-    fl_draw_policy_panel(
-        _axes[1, 0],
-        fl_stationary_policy.reshape(4, 4),
-        "π(s) — stale",
-    )
-    fl_draw_policy_panel(
-        _axes[1, 1],
-        fl_myopic_policy_traj[_t].reshape(4, 4),
-        f"π(s, t={_t}) — myopic",
-    )
-    fl_draw_policy_panel(
-        _axes[1, 2],
-        fl_oracle_policy[_t].reshape(4, 4),
-        f"π(s, t={_t}) — oracle",
-    )
-
-    _fig.suptitle(
-        f"k = {fl_adapt_k.value:.2f}   •   top: V(s,t) (shared scale)   bottom: π(s,t)",
-        fontsize=10,
-    )
-    _fig.colorbar(_im_v, ax=_axes[0, :], fraction=0.025, pad=0.02)
-    _fig.legend(
-        handles=FL_ACTION_LEGEND,
-        loc="lower center", ncol=4, fontsize=9,
-        bbox_to_anchor=(0.5, -0.01), frameon=False,
-    )
-    _fig
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #555; background: #f6f6f6;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Animated rollout — classic FrozenLake render next to V(s, t)</div></div>
-
-    Pre-roll an episode under the oracle policy at the current `k`,
-    then scrub. Left panel: the FrozenLake grid drawn in matplotlib
-    with a magenta marker for the agent (no pygame — keeps the demo
-    working under macOS' main-thread SDL restriction). Right panel:
-    the oracle's `V(s, t)` heatmap *at that same step*. As the agent
-    walks, both update in lockstep.
-    """)
-    return
-
-
-@app.cell
-def _(FL_ACTION_ARROWS, FL_MAP, np):
-    from matplotlib.colors import ListedColormap as _FLAgentCmap
-
-    _FL_TILE_CMAP = _FLAgentCmap(["#bce4f0", "#1a1a1a", "#ffd700"])
-    _FL_TILE_CODE = {"F": 0, "S": 0, "H": 1, "G": 2}
-
-    def fl_draw_agent_panel(ax, agent_state, action_taken=None, title=""):
-        """Render the 4x4 FrozenLake grid + agent marker via matplotlib.
-
-        Avoids pygame entirely so we don't fight SDL/Cocoa main-thread
-        restrictions on macOS when running off-main-thread (marimo run).
-        """
-        tile_grid = np.zeros((4, 4), dtype=int)
-        for r in range(4):
-            for c in range(4):
-                tile_grid[r, c] = _FL_TILE_CODE[FL_MAP[r][c]]
-        ax.imshow(tile_grid, cmap=_FL_TILE_CMAP, vmin=-0.5, vmax=2.5)
-
-        for r in range(4):
-            for c in range(4):
-                tile = FL_MAP[r][c]
-                if tile == "H":
-                    ax.text(c, r, "H", ha="center", va="center",
-                            color="red", fontsize=14, fontweight="bold")
-                elif tile == "G":
-                    ax.text(c, r, "G", ha="center", va="center",
-                            color="black", fontsize=15, fontweight="bold")
-                elif tile == "S":
-                    ax.text(c, r - 0.32, "S", ha="center", va="center",
-                            color="black", fontsize=10, alpha=0.55)
-
-        agent_row, agent_col = divmod(int(agent_state), 4)
-        ax.scatter(
-            [agent_col], [agent_row],
-            s=520, c="magenta", edgecolors="black",
-            linewidth=1.5, zorder=5,
-        )
-        if action_taken is not None:
-            ax.text(
-                agent_col, agent_row,
-                FL_ACTION_ARROWS[int(action_taken)],
-                ha="center", va="center", color="white",
-                fontsize=14, fontweight="bold", zorder=6,
-            )
-        ax.set_title(title, fontsize=10)
-        ax.set_xticks([])
-        ax.set_yticks([])
-
-    return (fl_draw_agent_panel,)
-
-
-@app.cell
-def _(
-    ContinuousScheduler,
-    DistributionDecrementUpdate,
-    NSFrozenLakeWrapper,
-    fl_adapt_k,
-    fl_init_intended,
-    fl_oracle_policy,
-    gym,
-    type_mismatch_checker,
-):
-    def fl_animate_oracle_rollout(seed=0):
-        # No render_mode -> no pygame import, no SDL/Cocoa crash.
-        env = gym.make(
-            "FrozenLake-v1", is_slippery=False, max_episode_steps=50,
-        )
-        ns_env = NSFrozenLakeWrapper(
-            env,
-            {"P": DistributionDecrementUpdate(
-                scheduler=ContinuousScheduler(), k=float(fl_adapt_k.value),
-            )},
-            change_notification=True,
-            delta_change_notification=True,
-            initial_prob_dist=init_dist(fl_init_intended.value),
-        )
-        obs, _ = ns_env.reset(seed=seed)
-        state, _ = type_mismatch_checker(obs)
-        T = fl_oracle_policy.shape[0]
-        states = [int(state)]
-        actions = []
-        ts = [0]
-        done = trunc = False
-        t = 0
-        while not (done or trunc):
-            a = int(fl_oracle_policy[min(t, T - 1), int(state)])
-            actions.append(a)
-            obs, reward, done, trunc, _ = ns_env.step(a)
-            state, reward = type_mismatch_checker(obs, reward)
-            states.append(int(state))
-            t += 1
-            ts.append(t)
-        return states, actions, ts
-
-    fl_anim_states, fl_anim_actions, fl_anim_ts = fl_animate_oracle_rollout(seed=0)
-    return fl_anim_actions, fl_anim_states, fl_anim_ts
-
-
-@app.cell
-def _(fl_anim_states, mo):
-    fl_anim_idx = mo.ui.slider(
-        start=0, stop=max(len(fl_anim_states) - 1, 1), step=1, value=0,
-        label="rollout step",
-    )
-    fl_anim_idx
-    return (fl_anim_idx,)
-
-
-@app.cell
-def _(
-    fl_adapt_k,
-    fl_anim_actions,
-    fl_anim_idx,
-    fl_anim_states,
-    fl_anim_ts,
-    fl_draw_agent_panel,
-    fl_draw_value_panel,
-    fl_oracle_V,
-    fl_oracle_policy,
-    plt,
-):
-    _i = min(fl_anim_idx.value, len(fl_anim_states) - 1)
-    _t = fl_anim_ts[_i] if _i < len(fl_anim_ts) else fl_anim_ts[-1]
-    _t_clamped = min(_t, fl_oracle_policy.shape[0] - 1)
-    _vmax = max(float(fl_oracle_V[0].max()), 1e-3)
-    _action_taken = (
-        fl_anim_actions[_i - 1] if 0 < _i <= len(fl_anim_actions) else None
-    )
-    _action_str = (
-        ["←", "↓", "→", "↑"][_action_taken]
-        if _action_taken is not None else "—"
-    )
-
-    _fig, _axes = plt.subplots(1, 2, figsize=(10, 4.6))
-    fl_draw_agent_panel(
-        _axes[0],
-        agent_state=fl_anim_states[_i],
-        action_taken=_action_taken,
-        title=(
-            f"step {_i}/{len(fl_anim_states) - 1}   "
-            f"action: {_action_str}   t={_t_clamped}"
-        ),
-    )
-    fl_draw_value_panel(
-        _axes[1],
-        fl_oracle_V[_t_clamped].reshape(4, 4),
-        fl_oracle_policy[_t_clamped].reshape(4, 4),
-        f"Oracle V(s, t={_t_clamped})",
-        vmax=_vmax,
-    )
-    _fig.suptitle(f"k = {fl_adapt_k.value:.2f}", fontsize=10)
-    _fig.tight_layout()
-    _fig
-    return
-
-
-@app.cell
 def _(type_mismatch_checker):
     def fl_oracle_rollout(env, oracle_policy, seed=0):
         """Time-aware rollout — `oracle_policy` is a (T, S) int array."""
@@ -5444,382 +5217,6 @@ def _(type_mismatch_checker):
         return ep_return
 
     return (fl_oracle_rollout,)
-
-
-@app.cell
-def _(
-    fl_adapt_k,
-    fl_make_env,
-    fl_oracle_policy,
-    fl_oracle_rollout,
-    fl_replan_rollout,
-    fl_rollout,
-    fl_stationary_policy,
-    fl_vi_policy,
-    np,
-    plt,
-):
-    _seeds = list(range(30))
-    _stale = []
-    _replan = []
-    _oracle = []
-    for _s in _seeds:
-        _env_a = fl_make_env(fl_adapt_k.value)
-        _env_b = fl_make_env(fl_adapt_k.value)
-        _env_c = fl_make_env(fl_adapt_k.value)
-        np.random.seed(_s)
-        _ra, _, _ = fl_rollout(_env_a, fl_vi_policy, seed=_s)
-        np.random.seed(_s)
-        _rb, _ = fl_replan_rollout(_env_b, fl_stationary_policy, seed=_s)
-        np.random.seed(_s)
-        _rc = fl_oracle_rollout(_env_c, fl_oracle_policy, seed=_s)
-        _stale.append(_ra)
-        _replan.append(_rb)
-        _oracle.append(_rc)
-
-    _fig, _ax = plt.subplots(figsize=(8, 3.2))
-    _w = 0.27
-    _idx = np.arange(len(_seeds))
-    _ax.bar(_idx - _w, _stale, _w, color="tab:red",
-            label=f"stale (μ={np.mean(_stale):.2f})")
-    _ax.bar(_idx, _replan, _w, color="tab:blue",
-            label=f"replan (μ={np.mean(_replan):.2f})")
-    _ax.bar(_idx + _w, _oracle, _w, color="tab:green",
-            label=f"oracle (μ={np.mean(_oracle):.2f})")
-    _ax.set_xlabel("episode")
-    _ax.set_ylabel("return")
-    _ax.set_title(f"Three planners at k={fl_adapt_k.value:.2f}")
-    _ax.legend(fontsize=8)
-    _fig.tight_layout()
-    _fig
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #555; background: #f6f6f6;"><div style="font-size: 1.2em; font-weight: 700; line-height: 1.2;">Rollout diagnostics — parameter trajectory + Q-gap</div></div>
-
-    Per-step trace of one rollout under each planner. Top: the
-    transition parameter `P[intended]` evolving through the episode.
-    Bottom: the **Q-gap** — for each visited state and step, how much
-    *Q-value* the policy left on the table by picking its action
-    instead of the oracle's. Q-gap = 0 ⇔ same action; positive ⇔
-    sub-optimal.
-
-    Both Q values use the oracle's `(P_t, R_t)` tensors, so this is the
-    "you should have done X" diagnostic against the foresighted
-    benchmark — same yardstick used in the comp-template metrics.
-    """)
-    return
-
-
-@app.cell
-def _(
-    fl_adapt_k,
-    fl_make_env,
-    fl_oracle_P,
-    fl_oracle_R,
-    fl_oracle_V,
-    fl_oracle_gamma,
-    fl_oracle_policy,
-    fl_replan_rollout,
-    fl_stationary_policy,
-    fl_vi_policy,
-    np,
-    type_mismatch_checker,
-):
-    def _oracle_q_at(t_idx, state):
-        """Oracle Q(s, a) at time t using the time-augmented tensors."""
-        n_actions = fl_oracle_P.shape[2]
-        n_states = fl_oracle_P.shape[1]
-        return np.array([
-            sum(
-                fl_oracle_P[t_idx, state, a, sp] *
-                (fl_oracle_R[t_idx, state, a, sp]
-                 + fl_oracle_gamma * fl_oracle_V[t_idx + 1, sp])
-                for sp in range(n_states)
-            )
-            for a in range(n_actions)
-        ])
-
-    def fl_rollout_with_metrics(env, action_picker, seed=0):
-        """Roll one episode, capturing per-step diagnostics.
-
-        `action_picker(state, t, env)` returns the action to take.
-        Returns dict-of-arrays in the comp-template style.
-        """
-        T_horizon = fl_oracle_V.shape[0] - 1
-        obs, _ = env.reset(seed=seed)
-        state, _ = type_mismatch_checker(obs)
-        m = {
-            "step": [], "state": [], "action": [],
-            "action_oracle": [], "q_gap": [],
-            "intended_prob": [], "reward": [],
-        }
-        done = trunc = False
-        t = 0
-        while not (done or trunc):
-            t_idx = min(t, T_horizon - 1)
-            q_per_a = _oracle_q_at(t_idx, int(state))
-            a_oracle = int(np.argmax(q_per_a))
-            a_taken = int(action_picker(int(state), t, env))
-            gap = float(q_per_a[a_oracle] - q_per_a[a_taken])
-            m["step"].append(t)
-            m["state"].append(int(state))
-            m["action"].append(a_taken)
-            m["action_oracle"].append(a_oracle)
-            m["q_gap"].append(gap)
-            m["intended_prob"].append(float(env.transition_prob[0]))
-            obs, reward, done, trunc, _ = env.step(a_taken)
-            state, reward = type_mismatch_checker(obs, reward)
-            m["reward"].append(float(reward))
-            t += 1
-        return m
-
-    def _stale_picker(state, _t, _env):
-        return int(fl_vi_policy(state))
-
-    def _oracle_picker(state, t, _env):
-        T = fl_oracle_policy.shape[0]
-        return int(fl_oracle_policy[min(t, T - 1), state])
-
-    fl_diag_seed = 0
-
-    fl_diag_stale = fl_rollout_with_metrics(
-        fl_make_env(fl_adapt_k.value),
-        _stale_picker, seed=fl_diag_seed,
-    )
-    fl_diag_oracle = fl_rollout_with_metrics(
-        fl_make_env(fl_adapt_k.value), _oracle_picker, seed=fl_diag_seed,
-    )
-
-    # Replan: needs to peek at obs["env_change"] to decide when to refit.
-    # Easier to run a parallel rollout that mimics fl_replan_rollout but
-    # also captures metrics. We re-use fl_replan_rollout for the return
-    # then collect metrics by running a separate trace below.
-    fl_diag_replan_returns = fl_replan_rollout(
-        fl_make_env(fl_adapt_k.value), fl_stationary_policy, seed=fl_diag_seed,
-    )
-
-    def _avg_q_gap(picker, n_seeds, T_max):
-        """Returns (mean_gap_per_step, count_per_step, per_seed_cum_gap).
-
-        per_seed_cum_gap is a length-n_seeds array of total cumulative
-        Q-gap per episode -- the right granularity for a violin plot.
-        """
-        sum_gap = np.zeros(T_max)
-        count = np.zeros(T_max)
-        per_seed_cum = np.zeros(n_seeds, dtype=np.float64)
-        for s in range(n_seeds):
-            m = fl_rollout_with_metrics(
-                fl_make_env(fl_adapt_k.value), picker, seed=s,
-            )
-            for t, g in zip(m["step"], m["q_gap"]):
-                if t < T_max:
-                    sum_gap[t] += g
-                    count[t] += 1
-                per_seed_cum[s] += g
-        return sum_gap / np.maximum(count, 1), count, per_seed_cum
-
-    fl_diag_n_seeds = 20
-    fl_diag_T_max = fl_oracle_P.shape[0]
-    (
-        fl_diag_stale_avg, fl_diag_stale_count, fl_diag_stale_per_seed,
-    ) = _avg_q_gap(_stale_picker, fl_diag_n_seeds, fl_diag_T_max)
-    (
-        fl_diag_oracle_avg, fl_diag_oracle_count, fl_diag_oracle_per_seed,
-    ) = _avg_q_gap(_oracle_picker, fl_diag_n_seeds, fl_diag_T_max)
-    return (
-        fl_diag_n_seeds,
-        fl_diag_oracle,
-        fl_diag_oracle_per_seed,
-        fl_diag_stale,
-        fl_diag_stale_per_seed,
-    )
-
-
-@app.cell
-def _(
-    fl_diag_n_seeds,
-    fl_diag_oracle,
-    fl_diag_oracle_per_seed,
-    fl_diag_stale,
-    fl_diag_stale_per_seed,
-    np,
-    plt,
-):
-    # Top + middle panels share the per-step x-axis; the bottom violin
-    # is its own thing.
-    _fig = plt.figure(figsize=(10, 8.6), constrained_layout=True)
-    _gs = _fig.add_gridspec(3, 1, height_ratios=[1.0, 1.0, 1.1])
-    _axes = [_fig.add_subplot(_gs[0]), _fig.add_subplot(_gs[1])]
-    _axes.append(_fig.add_subplot(_gs[2]))
-    _axes[0].sharex(_axes[1])
-
-    # Top: P[intended] over the rollout (single sample)
-    for label, m, color in [
-        ("stale-VI rollout", fl_diag_stale, "tab:red"),
-        ("oracle rollout", fl_diag_oracle, "tab:green"),
-    ]:
-        _axes[0].plot(m["step"], m["intended_prob"],
-                      label=label, color=color, linewidth=1.6, marker="o",
-                      markersize=3)
-    _axes[0].set_ylabel("P[intended]")
-    _axes[0].set_ylim(-0.05, 1.05)
-    _axes[0].legend(fontsize=8, loc="upper right")
-    _axes[0].set_title(
-        "Transition parameter over time (single episode sample, seed=0)",
-        fontsize=10,
-    )
-    _axes[0].axhline(0.5, color="grey", linewidth=0.5, alpha=0.4)
-
-    # Middle: Q-gap per step for the single sampled episode
-    for label, m, color in [
-        ("stale-VI gap", fl_diag_stale, "tab:red"),
-        ("oracle gap", fl_diag_oracle, "tab:green"),
-    ]:
-        _axes[1].plot(m["step"], m["q_gap"], label=label, color=color,
-                      linewidth=1.4, marker="o", markersize=3)
-        _disagree = [
-            (s, g) for s, g, a, ao in zip(m["step"], m["q_gap"],
-                                           m["action"], m["action_oracle"])
-            if a != ao
-        ]
-        if _disagree:
-            xs, gs = zip(*_disagree)
-            _axes[1].scatter(xs, gs, s=80, facecolors="none",
-                             edgecolors=color, linewidths=1.5, zorder=5)
-    _axes[1].axhline(0, color="grey", linewidth=0.6)
-    _axes[1].set_ylabel(r"$Q_{\text{oracle}}(s, a^*) - Q_{\text{oracle}}(s, a_\text{taken})$")
-    _axes[1].set_title(
-        "Q-gap — single episode sample (seed=0; "
-        "open circles = policy chose a different action than oracle)",
-        fontsize=10,
-    )
-    _axes[1].legend(fontsize=8, loc="upper right")
-
-    # Bottom: per-seed CUMULATIVE Q-gap distribution (violin + strip).
-    # Replaces the prior "mean Q-gap per step" line plot, which hid the
-    # per-seed spread and -- for monotone-non-decreasing cumulative Q-gap
-    # -- mostly just showed the slope. Each dot here is one episode's
-    # *total* regret vs. the oracle.
-    _per_seed = [
-        ("stale-VI", fl_diag_stale_per_seed,  "tab:red"),
-        ("oracle",   fl_diag_oracle_per_seed, "tab:green"),
-    ]
-    _names = [n for n, _, _ in _per_seed]
-    _data  = [d for _, d, _ in _per_seed]
-    _cols  = [c for _, _, c in _per_seed]
-    _positions = list(range(len(_names)))
-    _vp = _axes[2].violinplot(
-        _data, positions=_positions, showmeans=False,
-        showmedians=False, showextrema=False, widths=0.7,
-    )
-    for _body, _c in zip(_vp["bodies"], _cols):
-        _body.set_facecolor(_c); _body.set_edgecolor("black")
-        _body.set_alpha(0.45); _body.set_linewidth(0.6)
-    _rng = np.random.default_rng(0)
-    for _i, (_n, _d, _c) in enumerate(_per_seed):
-        _xs = _i + _rng.uniform(-0.12, 0.12, size=len(_d))
-        _axes[2].scatter(_xs, _d, s=28, alpha=0.75, color=_c,
-                         edgecolor="black", linewidth=0.4, zorder=4)
-        _mu = float(np.mean(_d))
-        _se = float(np.std(_d, ddof=1) / np.sqrt(len(_d))) if len(_d) > 1 else 0.0
-        _axes[2].errorbar(_i, _mu, yerr=_se, fmt="D", color="white",
-                          markerfacecolor="black", markeredgecolor="black",
-                          markersize=7, capsize=5, zorder=5)
-    _axes[2].axhline(0, color="grey", linewidth=0.6)
-    _axes[2].set_xticks(_positions)
-    _axes[2].set_xticklabels(_names, fontsize=9)
-    _axes[2].set_ylabel(r"per-episode total $\sum_t \Delta_Q$ (lower is better)")
-    _axes[2].set_title(
-        f"Per-seed cumulative Q-gap across {fl_diag_n_seeds} seeds "
-        "— oracle is the floor",
-        fontsize=10,
-    )
-
-    _fig
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    fl_oracle_run_sweep = mo.ui.run_button(label="Run oracle sweep")
-    mo.vstack([
-        mo.md(r"""
-        <div style="margin: 2.2em 0 0.8em 0; padding: 0.6em 1em 0.7em 1em; border-left: 5px solid #1a1a1a; background: #efefef;"><div style="font-size: 1.45em; font-weight: 700; line-height: 1.2;">Sweep — oracle returns vs drift</div></div>
-
-        For each `k`, build the time-indexed `(P, R)` tensors, JIT-VI to get
-        `policy[t, s]`, then evaluate. Stashed as `fl_oracle_sweep` and
-        saved to `results/nb_3_frozenlake_oracle.json`.
-        """),
-        fl_oracle_run_sweep,
-    ])
-    return (fl_oracle_run_sweep,)
-
-
-@app.cell
-def _(
-    build_ns_tensors,
-    fl_make_env,
-    fl_oracle_gamma,
-    fl_oracle_horizon,
-    fl_oracle_rollout,
-    fl_oracle_run_sweep,
-    mo,
-    np,
-    ns_oracle_vi,
-    save_sweep,
-):
-    import time as _time
-    fl_oracle_sweep = None
-    fl_oracle_sweep_path = None
-    if not fl_oracle_run_sweep.value:
-        _status = mo.md(
-            "_Click **Run oracle sweep** above (~15 s — builds time-"
-            "augmented (P, R) tensors and rolls out)._"
-        )
-    else:
-        _t0 = _time.time()
-        _ks = np.linspace(0.0, 0.3, 7)
-        _returns_by_k = {}
-        for _k in mo.status.progress_bar(
-            _ks, title="Oracle VI sweep",
-            subtitle="building (P,R) tensors and rolling out…",
-            remove_on_exit=True,
-        ):
-            _P, _R = build_ns_tensors(
-                lambda kk=_k: fl_make_env(kk), fl_oracle_horizon, seed=0,
-            )
-            _, _policy = ns_oracle_vi(_P, _R, fl_oracle_gamma)
-            _returns = []
-            for _ep in range(30):
-                _env = fl_make_env(_k)
-                _ret = fl_oracle_rollout(_env, _policy, seed=_ep)
-                _returns.append(float(_ret))
-            _returns_by_k[float(_k)] = _returns
-        fl_oracle_sweep = {
-            "env": "FrozenLake-v1",
-            "param": "P",
-            "scheduler": "ContinuousScheduler",
-            "update_fn": "DistributionDecrementUpdate",
-            "policy": "oracle-vi-time-augmented",
-            "horizon": fl_oracle_horizon,
-            "gamma": fl_oracle_gamma,
-            "n_episodes": 30,
-            "returns_by_k": _returns_by_k,
-        }
-        fl_oracle_sweep_path = save_sweep(
-            "nb_3_frozenlake_oracle.json", fl_oracle_sweep,
-        )
-        _status = mo.md(
-            f"✓ Oracle sweep finished in **{_time.time() - _t0:.1f} s** — "
-            f"7 drift levels × 30 episodes (oracle backward-induction). "
-            f"Saved to `{fl_oracle_sweep_path}`."
-        )
-    _status
-    return (fl_oracle_sweep,)
 
 
 @app.cell(hide_code=True)
