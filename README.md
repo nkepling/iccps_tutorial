@@ -1,24 +1,52 @@
-# ICCPS Tutorial On Non-Stationary Decision Making
+# CPS-IoT Week Tutorial — Non-Stationary Decision Making with NS-Gym
 
-## Installation
+A 90-minute hands-on workshop on modeling and solving non-stationary MDPs with [NS-Gym](https://nsgym.io). Designed to run from your laptop in a sandboxed Python environment — nothing is installed globally.
 
-For this tutorial there are two primary mechanisms two install `ns-gym`. The recommended path is to pull our pre-built docker image. This image contains all the neccessary packages and notebooks.
+## Install
 
+Three steps.
 
-You can pull docker image from the Github Container Registry. This is a Python 3.12 docker image with `ns-gym`, `torch` , `numpy` and 
+### 1. Install `uv`
+
+`uv` is a fast Python package manager from Astral. It manages the sandboxed environment that runs the notebook.
+
+**macOS / Linux:**
 
 ```bash
-docker pull ghcr.io/nkepling/ns-gym-tutorial:latest
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
+**Windows (PowerShell):**
 
-
-```python
-uv pip install ns-gym
+```powershell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-## Outline
+Other install methods: <https://docs.astral.sh/uv/getting-started/installation/>.
+
+After installing, restart your shell (or `source ~/.zshrc` / `source ~/.bashrc`) so the `uv` command is on your `PATH`.
+
+### 2. Clone this repo
+
+```bash
+git clone https://github.com/nkepling/iccps_tutorial.git
+cd iccps_tutorial
+```
+
+### 3. Run the notebook
+
+```bash
+uvx marimo run --sandbox tutorial.py
+```
+
+That's it. `uv` reads the pinned dependency list at the top of `tutorial.py` (PEP 723 inline script metadata), builds an isolated venv, and starts marimo. A browser tab opens with the tutorial.
+
+> **First run takes ~30–60 s** while `uv` downloads numba, ns-gym, gymnasium, etc. into the sandbox. Subsequent runs use the cached venv and start instantly. Nothing pollutes your global Python.
 
 
 
+## More
 
+- NS-Gym docs: <https://nsgym.io>
+- NS-Gym source: <https://github.com/scope-lab-vu/ns_gym>
+- AAMAS 2026 competition: <https://nsgym.io/aamas2026_competition.html>

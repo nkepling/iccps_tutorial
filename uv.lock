@@ -495,7 +495,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "marimo", specifier = ">=0.23.4" },
-    { name = "ns-gym", specifier = "==1.0.11" },
+    { name = "ns-gym", specifier = "==1.0.12" },
     { name = "numba", specifier = ">=0.60.0" },
     { name = "numpy", specifier = ">=2.4.4" },
 ]
@@ -1001,7 +1001,7 @@ wheels = [
 
 [[package]]
 name = "ns-gym"
-version = "1.0.11"
+version = "1.0.12"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
@@ -1021,7 +1021,7 @@ dependencies = [
     { name = "werkzeug" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/bd/94a1219b1a4f37712a6010b64b46e774761c5f045e739f7087b4f03693f2/ns_gym-1.0.11-py3-none-any.whl", hash = "sha256:c69a78245a467788dbfc65074b189b5f3b2830815b9a3a19396badd5fc721367", size = 9107197, upload-time = "2026-05-08T17:09:18.11Z" },
+    { url = "https://files.pythonhosted.org/packages/87/fa/1d43fda7c09612ad74c7846091b5134f4cf1c674c14f3ed61ef755c15891/ns_gym-1.0.12-py3-none-any.whl", hash = "sha256:500c27a6352e671b9f4775a2653f1bdc6a4726f6bc9e9a55d71f33482271fec9", size = 9109837, upload-time = "2026-05-10T15:46:57.426Z" },
 ]
 
 [[package]]
