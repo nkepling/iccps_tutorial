@@ -11,7 +11,6 @@
 # ]
 # ///
 
-
 import marimo
 
 __generated_with = "0.23.5"
@@ -250,7 +249,7 @@ def _(mo):
 
     ## 1. **What** changes?  *(which environmental parameter drifts —slip probability, gravity, masspole, …)*
     ## 2. **How** does it change?  *(the update function — sigmoid, random walk, step, …)*
-    ## 3. Does the agent **detect** the change?  *(is there a notificationon every step that the dynamics moved?)*
+    ## 3. Does the agent **detect** the change?  *(is there a notification on every step that the dynamics moved?)*
     ## 4. Does the agent **know** the change?  *(does the notification carry the new parameter, or just a "something moved" flag?)*
     """)
     return
@@ -313,11 +312,11 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 2.5em; font-weight: 700; line-height: 1.2;">What does an "agent" need to operate in non-stationary environments?</div></div>
 
-    ## What constitutes an agent in the literature has been in flux, so in NS-Gym we try to keep the abstraction as generall as possible. We argue that in a real decision making entity may or may not consist of the following elements:
+    ## What constitutes an agent in the literature has been in flux, so in NS-Gym we try to keep the abstraction as general as possible. We argue that a real decision-making entity may or may not consist of the following elements:
 
     ### 1. **Decision-making algorithm** — produces an action given the current observation and (a model of) the dynamics.
-    ### 2. **Runtime monitor** — answers *"has a parameter changed?" either by listening to the wrapper's notification or by detecting drift on its own.
-    ### 3. **Model updater** — answers *"what is the updated parameter?" and refreshes the planning model the decision-maker queries.
+    ### 2. **Runtime monitor** — answers *"has a parameter changed?"* either by listening to the wrapper's notification or by detecting drift on its own.
+    ### 3. **Model updater** — answers *"what is the updated parameter?"* and refreshes the planning model the decision-maker queries.
 
     ### NS-Gym can emulate both the runtime and model updater components with its "notifications" mechanism.
     """)
@@ -421,12 +420,12 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #5a3a8a; background: #f6f2fb;"><div style="font-size: 2.5em; font-weight: 700; line-height: 1.2;">How Does NS-Gym Augment Gymnasium? </div></div>
 
-    ## NS-Gym provides a Set of Gymanisium Envionment wrappers that:
+    ## NS-Gym provides a set of Gymnasium environment wrappers that:
 
 
-    ### 1) Defines a set of observable environment parameters, $\theta$ that in a completely configurable manner be altered to induced non-stationarity
+    ### 1) Defines a set of observable environment parameters, $\theta$ that in a completely configurable manner can be altered to induce non-stationarity
 
-    ### 2) Controls the nature of agent-environment interaction in a non-starionary desicion emulating the runtime and model updater components -- therefore focusing development of the core decision making algorithms
+    ### 2) Controls the nature of agent-environment interaction in a non-stationary decision-making setup, emulating the runtime and model updater components — therefore focusing development on the core decision-making algorithms
     """)
     return
 
@@ -686,11 +685,11 @@ def _(mo):
 
     ### Straight from the [NS-Gym quickstart](https://nsgym.io/quickstart_guide.html) — a CartPole whose `masspole` drifts continuously and whose `gravity` random-walks every 3 steps:
 
-    ### The basic workflow of NS-Gym easy augments existing Gymnasium environments with non-starionary behavior.
+    ### The basic workflow of NS-Gym easily augments existing Gymnasium environments with non-stationary behavior.
 
     ### In code the steps are as follows:
 
-    ### **Import Necesarry Modules**
+    ### **Import Necessary Modules**
 
     ```python
     import gymnasium as gym
@@ -705,7 +704,7 @@ def _(mo):
     env = gym.make("CartPole-v1")
     ```
 
-    ### **2)** Decide **what** about then environment changes
+    ### **2)** Decide **what** about the environment changes
 
     ```python
     param_1 = "masspole" #mass of the pole
@@ -721,7 +720,7 @@ def _(mo):
     ### **4)** Decide **how** parameters change
 
     ```python
-    update_function_1 = IncrementUpdate(sheduler_1, k=0.1) # At scheduler_1 timesteps increment param_1 value by 0.1
+    update_function_1 = IncrementUpdate(scheduler_1, k=0.1) # At scheduler_1 timesteps increment param_1 value by 0.1
     update_function_2 = RandomWalk(scheduler_2) # At scheduler_2 timesteps increment param_2 value by a random walk
     ```
     ### **5)** Map parameter to their change rules
@@ -732,7 +731,7 @@ def _(mo):
         param_2:  update_function_2,
     }
     ```
-    ### **6)** Define *how** the agent interacts with the environment**
+    ### **6)** Define **how** the agent interacts with the environment
 
     ```python
     ns_env = NSClassicControlWrapper(env, tunable_params, change_notification=True)
@@ -3384,7 +3383,7 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
- 
+
     """)
     return
 
@@ -3862,7 +3861,7 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
- 
+
     """)
     return
 
@@ -4311,7 +4310,7 @@ def _(mo):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
- 
+
     """)
     return
 
@@ -6919,7 +6918,7 @@ def _(
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
- 
+
     """)
     return
 
