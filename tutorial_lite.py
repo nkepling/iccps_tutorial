@@ -122,6 +122,7 @@ def _(mo):
             _tile("cartpole_stationary.gif", "CartPole"),
             _tile("mountain_car.gif", "MountainCar"),
             _tile("pendulum.gif", "Pendulum"),
+            _tile("ant.gif", "Ant (MuJoCo)"),
         ], justify="center", gap=1),
         mo.md(
             "<div style='text-align:center; font-size:0.85em; opacity:0.6;'>"
