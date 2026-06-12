@@ -2237,64 +2237,80 @@ def _(mo):
     mo.md(r"""
     <div style="margin: 1.6em 0 0.5em 0; padding: 0.4em 0.8em; border-left: 4px solid #555; background: #f6f6f6;"><div style="font-size: 2.5em; font-weight: 700; line-height: 1.2;">Performance — stale vs replan vs oracle on your env</div></div>
 
-    ### **100 episodes** per planner, same drift schedule, fresh RNGs per episode.
+    ### **Same source of truth for all three.** Rather than noisy Monte-Carlo rollouts, we take the policy each planner already produced and evaluate it **on the true non-stationary tensor** `fl_your_P / fl_your_R` with backward-pass policy evaluation. $V^\pi(s,t)$ is the *exact* expected discounted return from $(s,t)$ under the true time-indexed dynamics — no sampling noise, no realization mismatch.
 
-    ### - **Left — xreturn distribution per planner.**
-    ### - Violin shape carries the median, IQR and the long tail of zeros. The dot marks the mean; the annotation gives success rate over all seeds.
-    ###- **Right — paired difference.** For each seed, *(oracle − stale)* and *(oracle − replan)*. Dots above 0 mean oracle wins on that seed; dots below 0 are the surprising losses you noticed. The vertical band is the mean ± SE of the per-seed difference.
+    ### - **Left — policy value on the tensor.** Distribution of $V^\pi(s, t{=}0)$ over the non-terminal start states. The ★ marks the value from the start tile `S`; the hollow dot is the mean over states.
+    ###- **Right — paired difference vs the oracle.** Per state, *(oracle − stale)* and *(oracle − replan)* at $t{=}0$. Because the oracle is the optimum of *this same tensor*, every point sits at or above 0 — it dominates **pointwise, by construction**. (The earlier per-seed rollout could show the oracle "losing" individual seeds: it had been planned against one drift realization while each episode re-rolled the env, so slip noise — not a worse policy — flipped the sign. Those were the "surprising losses.")
     """)
     return
 
 
 @app.cell
 def _(
+    FL_MAP,
     fl_drift_pick,
-    fl_oracle_policy,
-    fl_oracle_rollout,
-    fl_replan_rollout,
-    fl_rollout,
+    fl_oracle_gamma,
     fl_sched_pick,
     fl_stationary_policy,
-    fl_vi_policy,
-    fl_your_make_env,
+    fl_your_P,
+    fl_your_R,
+    fl_your_myopic_policy,
     fl_your_oracle_policy,
-    mo,
     np,
     plt,
+    policy_eval_ns_jit,
 ):
-    _ = fl_oracle_policy  # silence unused import; we use fl_your_oracle_policy
-    _N_SEEDS = 100
-    _seeds = list(range(_N_SEEDS))
-    _stale, _replan, _oracle = [], [], []
-    for _s in mo.status.progress_bar(
-        _seeds, title="Stale vs replan vs oracle on your env",
-        subtitle=f"rolling out 3 planners × {_N_SEEDS} seeds…",
-        remove_on_exit=True,
-    ):
-        _env_a = fl_your_make_env()
-        _env_b = fl_your_make_env()
-        _env_c = fl_your_make_env()
-        np.random.seed(_s)
-        _ra, _, _ = fl_rollout(_env_a, fl_vi_policy, seed=_s)
-        np.random.seed(_s)
-        _rb, _ = fl_replan_rollout(_env_b, fl_stationary_policy, seed=_s)
-        np.random.seed(_s)
-        _rc = fl_oracle_rollout(_env_c, fl_your_oracle_policy, seed=_s)
-        _stale.append(float(_ra))
-        _replan.append(float(_rb))
-        _oracle.append(float(_rc))
-    _stale_a = np.asarray(_stale)
-    _replan_a = np.asarray(_replan)
-    _oracle_a = np.asarray(_oracle)
+    # Same source of truth for all three planners: take the policy each
+    # one already produced and evaluate it on the *true* non-stationary
+    # tensor (fl_your_P / fl_your_R) with backward-pass policy evaluation.
+    # V^pi(s, t) is the exact expected discounted return from (s, t) under
+    # the true time-indexed dynamics — no Monte-Carlo noise and no
+    # realization mismatch. (The earlier per-seed rollout planned the
+    # oracle on a single drift realization while every episode re-rolled
+    # the env, so slip noise — not a worse policy — could flip individual
+    # seeds and produce the "surprising losses".) The oracle is the
+    # optimum of this same tensor, so V^pi_oracle >= V^pi_replan >=
+    # V^pi_stale *pointwise*, by construction.
+    _T = fl_your_P.shape[0]
+    _S = fl_your_P.shape[1]
+
+    # Stale policy is constant in t — broadcast (S,) -> (T, S).
+    _stale_tt = np.broadcast_to(
+        fl_stationary_policy.astype(np.int64), (_T, _S)
+    ).copy()
+    _V_stale = policy_eval_ns_jit(
+        fl_your_P, fl_your_R, fl_oracle_gamma, _stale_tt,
+    )
+    _V_replan = policy_eval_ns_jit(
+        fl_your_P, fl_your_R, fl_oracle_gamma,
+        fl_your_myopic_policy.astype(np.int64),
+    )
+    _V_oracle = policy_eval_ns_jit(
+        fl_your_P, fl_your_R, fl_oracle_gamma,
+        fl_your_oracle_policy.astype(np.int64),
+    )
+
+    # Distribution is over the *non-terminal* states at t=0 — holes / goal
+    # are absorbing (V=0) and would just pile mass at zero. The start tile
+    # S (state 0) is the headline number.
+    _nonterm = np.array([
+        _i for _i in range(_S)
+        if FL_MAP[_i // 4][_i % 4] not in ("H", "G")
+    ])
+    _stale_a = _V_stale[0, _nonterm]
+    _replan_a = _V_replan[0, _nonterm]
+    _oracle_a = _V_oracle[0, _nonterm]
+    _start_vals = (_V_stale[0, 0], _V_replan[0, 0], _V_oracle[0, 0])
 
     _fig, (_ax_v, _ax_d) = plt.subplots(
         1, 2, figsize=(11.5, 3.8), layout="constrained",
     )
 
-    # --- Left: violin plot of return distributions ----------------
+    # --- Left: V^pi distribution over non-terminal start states -------
     _data = [_stale_a, _replan_a, _oracle_a]
     _names = ["stale-VI", "replan-VI", "oracle-VI"]
     _colors = ["tab:red", "tab:blue", "tab:green"]
+    _ymax = max(0.05, float(np.max(_oracle_a)))
     _vp = _ax_v.violinplot(
         _data, positions=[0, 1, 2], showmeans=False,
         showmedians=False, showextrema=False, widths=0.75,
@@ -2304,67 +2320,69 @@ def _(
         _body.set_edgecolor("black")
         _body.set_alpha(0.55)
         _body.set_linewidth(0.6)
-    # Mean dot + SE bar for each violin.
-    for _i, (_arr, _col) in enumerate(zip(_data, _colors)):
+    # Hollow dot = mean over states; star = value from the start tile.
+    for _i, (_arr, _col, _sv) in enumerate(zip(_data, _colors, _start_vals)):
         _mu = float(np.mean(_arr))
-        _se = float(np.std(_arr, ddof=1) / np.sqrt(len(_arr)))
         _ax_v.errorbar(
-            _i, _mu, yerr=_se, fmt="o", color="white",
+            _i, _mu, fmt="o", color="white",
             markerfacecolor=_col, markeredgecolor="black",
-            markersize=8, capsize=4, zorder=5,
+            markersize=8, zorder=5,
         )
-        _succ = int(np.sum(_arr > 0))
+        _ax_v.scatter(
+            [_i], [_sv], marker="*", s=130, color=_col,
+            edgecolor="black", linewidth=0.6, zorder=6,
+        )
         _ax_v.text(
-            _i, 1.08,
-            f"μ={_mu:.2f}±{_se:.02f}\n{_succ}/{_N_SEEDS} succ",
+            _i, _ymax * 1.12,
+            f"start V={_sv:.3f}\n⟨V⟩={_mu:.3f}",
             ha="center", va="bottom", fontsize=8,
         )
     _ax_v.set_xticks([0, 1, 2])
     _ax_v.set_xticklabels(_names, fontsize=9)
-    _ax_v.set_ylabel("return  (1 = goal reached)")
-    _ax_v.set_ylim(-0.1, 1.3)
+    _ax_v.set_ylabel(r"$V^\pi(s,\,t{=}0)$  on the true NS tensor")
+    _ax_v.set_ylim(-0.02, _ymax * 1.4)
     _ax_v.axhline(0, color="grey", linewidth=0.5, alpha=0.4)
-    _ax_v.axhline(1, color="grey", linewidth=0.5, alpha=0.4)
     _ax_v.set_title(
-        f"Return distribution  (violins, N={_N_SEEDS})", fontsize=10,
+        f"Policy value on the NS tensor  "
+        f"(★ start tile, {len(_nonterm)} non-terminal states)",
+        fontsize=9,
     )
 
-    # --- Right: paired-diff strip plot ---------------------------
+    # --- Right: paired per-state difference vs the oracle -------------
     _diff_oracle_stale = _oracle_a - _stale_a
     _diff_oracle_replan = _oracle_a - _replan_a
     _diffs = [_diff_oracle_stale, _diff_oracle_replan]
     _diff_names = ["oracle − stale", "oracle − replan"]
     _diff_colors = ["tab:red", "tab:blue"]  # color of the *baseline*
+    _dmax = max(0.02, float(np.max(np.abs(np.concatenate(_diffs)))))
     _rng = np.random.default_rng(0)
     for _i, (_d, _col) in enumerate(zip(_diffs, _diff_colors)):
         _xs = _i + (_rng.uniform(-0.16, 0.16, size=len(_d)))
         _ax_d.scatter(
-            _xs, _d, s=18, alpha=0.55, color=_col,
+            _xs, _d, s=22, alpha=0.6, color=_col,
             edgecolor="black", linewidth=0.3,
         )
         _mu = float(np.mean(_d))
-        _se = float(np.std(_d, ddof=1) / np.sqrt(len(_d)))
-        _wins = int(np.sum(_d > 0))
-        _losses = int(np.sum(_d < 0))
+        _wins = int(np.sum(_d > 1e-9))
+        _ties = int(np.sum(np.abs(_d) <= 1e-9))
         _ax_d.errorbar(
-            _i, _mu, yerr=_se, fmt="D", color="white",
+            _i, _mu, fmt="D", color="white",
             markerfacecolor="black", markeredgecolor="black",
-            markersize=7, capsize=5, zorder=5,
+            markersize=7, zorder=5,
         )
         _ax_d.text(
-            _i, 1.18,
-            f"μ_diff={_mu:+.2f}±{_se:.02f}\n"
-            f"oracle wins {_wins}/{_N_SEEDS}  ·  "
-            f"loses {_losses}/{_N_SEEDS}",
+            _i, _dmax * 1.12,
+            f"⟨Δ⟩={_mu:+.3f}\n"
+            f"oracle ≥ on {_wins + _ties}/{len(_d)} (tie {_ties})",
             ha="center", va="bottom", fontsize=8,
         )
     _ax_d.axhline(0, color="grey", linewidth=0.8)
     _ax_d.set_xticks([0, 1])
     _ax_d.set_xticklabels(_diff_names, fontsize=9)
-    _ax_d.set_ylabel("per-seed return diff")
-    _ax_d.set_ylim(-1.4, 1.4)
+    _ax_d.set_ylabel(r"per-state $\Delta V^\pi$  at $t{=}0$")
+    _ax_d.set_ylim(-_dmax * 0.4, _dmax * 1.4)
     _ax_d.set_title(
-        "Paired difference per seed  (above 0 → oracle wins)",
+        "Paired difference per state  (≥ 0 → oracle dominates)",
         fontsize=10,
     )
 
@@ -2372,7 +2390,7 @@ def _(
     _short_drift = fl_drift_pick.value.split(" — ")[0].split("(")[0].strip()
     _fig.suptitle(
         f"YOUR env  •  {_short_sched}  ×  {_short_drift}  •  "
-        f"N={_N_SEEDS}",
+        f"value-eval on the true NS tensor",
         fontsize=10,
     )
     _fig
